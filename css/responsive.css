@@ -1,0 +1,38 @@
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:1000px){
+
+    .app{
+        grid-template-columns:1fr;
+    }
+
+    .sidebar{
+        height:45vh;
+    }
+
+    .main{
+        padding:14px;
+    }
+}
+
+@media(max-width:640px){
+
+    .sidebar-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .hero{
+        border-radius:18px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+}

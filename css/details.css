@@ -1,0 +1,710 @@
+/* =====================================================
+   DETAILS PANEL
+===================================================== */
+
+.hero{
+
+    background:var(--panel);
+
+    border:1px solid rgba(96,165,250,0.12);
+
+    border-radius:28px;
+
+    padding:clamp(18px,3vw,32px);
+
+    backdrop-filter:blur(16px);
+
+    box-shadow:var(--shadow);
+}
+
+.dataset-name{
+
+    font-size:clamp(2.4rem,4vw,4rem);
+
+    font-weight:800;
+
+    letter-spacing:-0.05em;
+
+    line-height:1;
+}
+
+.hero-sub{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-bottom:24px;
+}
+
+.section{
+
+    margin-top:20px;
+
+    background:rgba(2,8,23,0.65);
+
+    border:1px solid rgba(96,165,250,0.10);
+
+    border-radius:22px;
+
+    padding:20px;
+    overflow:hidden;
+    height:auto;
+}
+
+.section-title{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    margin-bottom:18px;
+}
+
+.group-block{
+    margin-bottom:18px;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px;
+    overflow:hidden;
+}
+
+.group-title{
+    background:#162235;
+    padding:10px 14px;
+    font-weight:700;
+    font-size:14px;
+    letter-spacing:0.4px;
+}
+
+.product-title{
+    background:#111927;
+    padding:8px 14px;
+    font-size:12px;
+    color:#9bb3d1;
+    border-top:1px solid rgba(255,255,255,0.04);
+}
+
+
+/* ===================================================== */
+/* LANDING HERO */
+/* ===================================================== */
+
+.landing-hero{
+
+    position:relative;
+
+    width:100%;
+
+    min-height:100vh;
+
+    overflow:hidden;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+}
+
+/* ===================================================== */
+/* ANIMATED BACKGROUND */
+/* ===================================================== */
+
+.landing-bg{
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(96,165,250,0.16),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at 80% 30%,
+            rgba(56,189,248,0.10),
+            transparent 40%
+        ),
+
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(255,180,80,0.08),
+            transparent 45%
+        );
+
+    animation:backgroundDrift 16s ease-in-out infinite alternate;
+
+    pointer-events:none;
+}
+
+@keyframes backgroundDrift{
+
+    0%{
+        transform:scale(1) translateY(0px);
+    }
+
+    100%{
+        transform:scale(1.05) translateY(-10px);
+    }
+}
+
+/* ===================================================== */
+/* LANDING CONTENT */
+/* ===================================================== */
+
+.landing-content-shell{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    z-index:5;
+
+    position:relative;
+}
+
+.landing-content{
+
+    width:min(92vw,1100px);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+}
+
+.landing-subtitle{
+
+    max-width:980px;
+
+    margin-inline:auto;
+}
+
+.landing-stats{
+
+    position:relative;
+
+    z-index:5;
+
+    width:min(1100px,92vw);
+
+    margin-top:50px;
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+
+    gap:18px;
+}
+
+.overview-subtitle{
+
+    margin-top:18px;
+
+    line-height:1.9;
+
+    font-size:15px;
+
+    color:var(--muted);
+
+    max-width:780px;
+}
+
+/* ===================================================== */
+/* SOLAR DISK */
+/* ===================================================== */
+
+.landing-art{
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    overflow:hidden;
+}
+
+.solar-disk{
+
+    position:absolute;
+
+    top:-140px;
+
+    right:-100px;
+
+    width:520px;
+
+    height:520px;
+
+    border-radius:50%;
+}
+
+.solar-glow{
+
+    position:absolute;
+
+    inset:0;
+
+    border-radius:50%;
+
+    background:
+
+        radial-gradient(
+            circle,
+            rgba(255,210,120,0.16),
+            rgba(255,210,120,0.04) 55%,
+            transparent 72%
+        );
+
+    animation:solarPulse 7s ease-in-out infinite;
+}
+
+@keyframes solarPulse{
+
+    0%{
+        transform:scale(1);
+        opacity:0.65;
+    }
+
+    50%{
+        transform:scale(1.03);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:0.65;
+    }
+}
+
+.solar-grid{
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:0.24;
+}
+
+.solar-ring{
+
+    fill:none;
+
+    stroke:#ffd37a;
+
+    stroke-width:2;
+}
+
+.solar-inner{
+
+    fill:none;
+
+    stroke:#ffd37a;
+
+    stroke-width:1;
+
+    opacity:0.4;
+}
+
+.solar-grid line{
+
+    stroke:#ffd37a;
+
+    stroke-width:1;
+
+    opacity:0.25;
+}
+
+/* ===================================================== */
+/* DKIST SILHOUETTE */
+/* ===================================================== */
+
+.dkist-silhouette{
+
+    position:absolute;
+
+    left:0;
+
+    right:0;
+
+    bottom:40px;
+
+    opacity:0.12;
+}
+
+.dkist-silhouette svg{
+
+    width:100%;
+
+    height:auto;
+}
+
+.dkist-shape{
+
+    fill:url(#dkistGradient);
+    fill:#8ab4ff;
+}
+
+.ground-line{
+
+    stroke:#8ab4ff;
+
+    stroke-width:1;
+}
+
+/* ===================================================== */
+/* LANDING CARDS */
+/* ===================================================== */
+
+.landing-cards{
+
+    position:relative;
+
+    z-index:5;
+
+    margin-top:80px;
+}
+
+
+/* =========================================
+   LANDING ACTIONS
+========================================= */
+
+.landing-actions{
+
+    margin-top:36px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    width:100%;
+}
+
+.explore-btn{
+
+    border:none;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(56,189,248,0.95),
+            rgba(37,99,235,0.95)
+        );
+
+    color:white;
+
+    padding:16px 28px;
+
+    border-radius:18px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:all 0.25s ease;
+
+    box-shadow:
+        0 10px 30px rgba(37,99,235,0.28);
+    display:flex;
+    justify-content:center;
+}
+
+.explore-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 16px 40px rgba(37,99,235,0.38);
+}
+
+
+/* =========================================
+   LANDING LAST UPDATED
+========================================= */
+
+.landing-last-updated{
+
+    position:absolute;
+
+    right:34px;
+
+    bottom:26px;
+
+    font-size:12px;
+
+    color:rgba(255,255,255,0.72);
+
+    letter-spacing:0.04em;
+
+    z-index:10;
+
+    padding:10px 14px;
+
+    border-radius:14px;
+
+    background:rgba(10,18,35,0.38);
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,0.08);
+    
+}
+
+body.light .landing-last-updated{
+
+    background:rgba(255,255,255,0.62);
+
+    color:#334155;
+
+    border:1px solid rgba(15,23,42,0.06);
+}
+
+
+/* =========================================
+   SOLAR ARC VISUALIZATION
+========================================= */
+
+.solar-arc-container{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:3;
+}
+
+/* whole svg */
+
+.solar-arc-svg{
+
+    position:absolute;
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    overflow:visible;
+
+    preserveAspectRatio:xMidYMid slice;
+}
+
+/* blurred atmospheric track */
+
+.solar-arc-blur{
+
+    fill:none;
+
+    stroke:rgba(255,255,255,0.06);
+
+    stroke-width:14;
+
+    filter:blur(10px);
+}
+
+/* actual orbit */
+
+.solar-arc-line{
+
+    fill:none;
+
+    stroke:rgba(255,255,255,0.18);
+
+    stroke-width:2.5;
+
+    stroke-linecap:round;
+
+    stroke-dasharray:14 16;
+
+    animation:
+        orbitDrift 18s linear infinite;
+}
+
+/* subtle drift */
+
+@keyframes orbitDrift{
+
+    from{
+        stroke-dashoffset:0;
+    }
+
+    to{
+        stroke-dashoffset:-60;
+    }
+}
+
+/* glow halo */
+
+/* outer atmosphere */
+
+.solar-glow-large{
+
+    fill:rgba(255,180,80,0.10);
+
+    filter:blur(24px);
+
+    animation:
+        solarPulseLarge 5s ease-in-out infinite;
+}
+
+/* inner glow */
+
+.solar-glow{
+
+    fill:rgba(255,190,90,0.24);
+
+    filter:blur(10px);
+
+    animation:
+        solarPulse 3.5s ease-in-out infinite;
+}
+
+/* solar disk */
+
+.solar-position{
+
+    fill:#ffd27a;
+
+    stroke:#fff7dc;
+
+    stroke-width:2;
+
+    filter:
+        drop-shadow(0 0 10px rgba(255,200,120,0.9))
+        drop-shadow(0 0 24px rgba(255,180,80,0.7));
+
+    animation:
+        solarFloat 5s ease-in-out infinite;
+}
+
+@keyframes solarPulse{
+
+    0%{
+        transform:scale(1);
+        opacity:0.6;
+    }
+
+    50%{
+        transform:scale(1.08);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:0.6;
+    }
+}
+
+@keyframes solarPulseLarge{
+
+    0%{
+        opacity:0.25;
+        transform:scale(1);
+    }
+
+    50%{
+        opacity:0.45;
+        transform:scale(1.12);
+    }
+
+    100%{
+        opacity:0.25;
+        transform:scale(1);
+    }
+}
+
+@keyframes solarFloat{
+
+    0%{
+        transform:translateY(0px);
+    }
+
+    50%{
+        transform:translateY(-2px);
+    }
+
+    100%{
+        transform:translateY(0px);
+    }
+}
+
+.solar-horizon-glow{
+
+    position:absolute;
+
+    left:50%;
+    bottom:-180px;
+
+    width:1200px;
+    height:420px;
+
+    transform:translateX(-50%);
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(255,170,80,0.22) 0%,
+            rgba(255,170,80,0.08) 35%,
+            transparent 72%
+        );
+
+    filter:blur(40px);
+
+    z-index:-1;
+
+    animation:
+        horizonGlow 10s ease-in-out infinite;
+}
+
+@keyframes horizonGlow{
+
+    0%{
+        opacity:0.55;
+    }
+
+    50%{
+        opacity:0.85;
+    }
+
+    100%{
+        opacity:0.55;
+    }
+}
+
+
+/* LIGHT THEME */
+
+body.light .solar-arc-line{
+
+    stroke:rgba(15,23,42,0.14);
+}
+
+body.light #solarPosition{
+
+    fill:#f59e0b;
+
+    stroke:#fff;
+}

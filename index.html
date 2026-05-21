@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DKIST Scientific Archive Browser</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/cards.css">
+    <link rel="stylesheet" href="css/details.css">
+    <link rel="stylesheet" href="css/context-media.css">
+    <link rel="stylesheet" href="css/solar.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+</head>
+
+<body class="landing-mode">
+
+
+    <div class="app">
+
+            <div
+                class="theme-switch"
+                id="themeToggle"
+                aria-label="Toggle theme"
+            >
+
+                <div class="theme-switch-track">
+
+                    <div class="theme-switch-thumb"></div>
+
+                    <div class="theme-icon sun">
+                        ☀
+                    </div>
+
+                    <div class="theme-icon moon">
+                        ☾
+                    </div>
+
+                </div>
+
+            </div>
+
+        <!-- ===================================== -->
+        <!-- SIDEBAR -->
+        <!-- ===================================== -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-header">
+
+                <div>
+                    <a href="#" id="homeLink" class="home-link">
+                        <div class="title">
+                            Cryo-NIRSP Archive
+                        </div>
+
+                        <div class="subtitle">
+                            Browser for CryoNIRSP metadata archives.
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="search-panel">
+
+                <input
+                    type="text"
+                    id="searchBox"
+                    placeholder="Search collections, products, dates, datasets..."
+                >
+
+                <select id="sortMode">
+
+                    <option value="chronological_desc">
+                        Newest First
+                    </option>
+
+                    <option value="chronological_asc">
+                        Oldest First
+                    </option>
+
+                    <option value="alphabetical">
+                        Alphabetical
+                    </option>
+
+                </select>
+
+                <select id="typeFilter">
+
+                    <option value="all">
+                        All datasets
+                    </option>
+
+                    <option value="polarimetric">
+                        Polarimetric
+                    </option>
+
+                    <option value="spectrometric">
+                        Spectrometric
+                    </option>
+
+                    <option value="context_imager">
+                        Context Imager
+                    </option>
+
+                </select>
+
+                <!-- STATS -->
+                <div class="stats">
+
+                    <div
+                        class="stat clickable-stat"
+                        data-filter="all"
+                    >
+                        <div class="stat-label">DATASETS</div>
+                        <div class="stat-value" id="nDatasets">0</div>
+                    </div>
+
+                    <div
+                        class="stat clickable-stat"
+                        data-filter="polarimetric"
+                    >
+                        <div class="stat-label">POLARIMETRIC</div>
+                        <div class="stat-value" id="nPolarimetric">0</div>
+                    </div>
+
+                    <div
+                        class="stat clickable-stat"
+                        data-filter="spectrometric"
+                    >
+                        <div class="stat-label">SPECTROMETRIC</div>
+                        <div class="stat-value" id="nSpectrometric">0</div>
+                    </div>
+
+                    <div
+                        class="stat clickable-stat"
+                        data-filter="context_imager"
+                    >
+                        <div class="stat-label">CONTEXT</div>
+                        <div class="stat-value" id="nContext">0</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div
+                class="tree-container"
+                id="tree"
+            ></div>
+
+        </aside>
+
+        <!-- ===================================== -->
+        <!-- MAIN PANEL -->
+        <!-- ===================================== -->
+
+        <main
+            class="main"
+            id="detailsPanel"
+        >
+
+            <div class="placeholder">
+                Select a dataset from the archive tree.
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- JAVASCRIPT -->
+    <!-- ===================================== -->
+
+    <script src="js/state.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/solar.js"></script>
+    <script src="js/solarArc.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/landing.js"></script>
+    <script src="js/tree.js"></script>
+    <script src="js/details.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

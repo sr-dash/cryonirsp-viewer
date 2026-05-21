@@ -1,0 +1,342 @@
+/* ===================================================== */
+/* LANDING HERO */
+/* ===================================================== */
+
+.landing-hero{
+
+    position:relative;
+
+    overflow:hidden;
+
+    min-height:92vh;
+
+    border-radius:32px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    padding:60px;
+
+    isolation:isolate;
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 0 60px rgba(59,130,246,0.15);
+
+    background:#050b16;
+}
+
+/* ===================================================== */
+/* BACKGROUND IMAGE */
+/* ===================================================== */
+
+.landing-image{
+
+    position:absolute;
+
+    inset:0;
+
+    background-image:
+        url("../assets/images/dkist-hero.jpg");
+
+    background-size:cover;
+
+    background-position:center;
+
+    opacity:0.42;
+
+    transform:scale(1.03);
+
+    z-index:-4;
+}
+
+/* ===================================================== */
+/* DARK/LIGHT OVERLAY */
+/* ===================================================== */
+
+.landing-overlay{
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(2,8,23,0.92) 0%,
+            rgba(2,8,23,0.72) 45%,
+            rgba(2,8,23,0.55) 100%
+        );
+
+    z-index:-3;
+    pointer-events:none;
+}
+
+body.light .landing-overlay{
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,0.80) 0%,
+            rgba(255,255,255,0.58) 45%,
+            rgba(255,255,255,0.38) 100%
+        );
+}
+
+/* ===================================================== */
+/* ANIMATED GLOW */
+/* ===================================================== */
+
+.landing-glow{
+
+    position:absolute;
+
+    width:900px;
+    height:900px;
+
+    top:-250px;
+    right:-250px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(56,189,248,0.20) 0%,
+            rgba(56,189,248,0.08) 35%,
+            transparent 70%
+        );
+
+    filter:blur(40px);
+
+    animation:floatGlow 12s ease-in-out infinite;
+
+    z-index:-2;
+    pointer-events:none;
+}
+
+@keyframes floatGlow{
+
+    0%{
+        transform:translateY(0px);
+    }
+
+    50%{
+        transform:translateY(30px);
+    }
+
+    100%{
+        transform:translateY(0px);
+    }
+}
+
+/* ===================================================== */
+/* CONTENT */
+/* ===================================================== */
+
+.landing-content{
+
+    max-width:760px;
+
+    z-index:2;
+}
+
+.landing-kicker{
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+    color:#fcba7d;
+
+    margin-bottom:18px;
+
+    font-weight:700;
+}
+
+.landing-title{
+
+    font-size:clamp(3.5rem,6vw,6rem);
+    letter-spacing:-0.06em;
+    line-height:1.05;
+
+    font-weight:800;
+
+    margin-bottom:24px;
+
+    color:white;
+
+    text-shadow:
+        0 4px 30px rgba(0,0,0,0.4);
+}
+
+body.light .landing-title{
+    color:#0f172a;
+}
+
+.landing-subtitle{
+    margin-top:24px;
+    font-size:1.05rem;
+
+    line-height:1.9;
+
+    max-width:720px;
+
+    color:#cbd5e1;
+}
+
+body.light .landing-subtitle{
+    color:#334155;
+}
+
+/* ===================================================== */
+/* BUTTONS */
+/* ===================================================== */
+
+.landing-buttons{
+
+    display:flex;
+
+    gap:16px;
+
+    margin-top:36px;
+
+    flex-wrap:wrap;
+}
+
+.landing-btn{
+
+    padding:14px 22px;
+
+    border-radius:14px;
+
+    border:none;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:0.22s;
+
+    font-size:14px;
+}
+
+.landing-btn.primary{
+
+    background:linear-gradient(
+        135deg,
+        #38bdf8,
+        #2563eb
+    );
+
+    color:white;
+}
+
+.landing-btn.primary:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 24px rgba(56,189,248,0.35);
+}
+
+.landing-btn.secondary{
+
+    background:rgba(255,255,255,0.08);
+
+    border:1px solid rgba(255,255,255,0.15);
+
+    color:white;
+
+    backdrop-filter:blur(10px);
+}
+
+body.light .landing-btn.secondary{
+
+    color:#0f172a;
+
+    background:rgba(255,255,255,0.65);
+}
+
+
+
+/* ===================================================== */
+/* STATS */
+/* ===================================================== */
+
+.landing-stats{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(180px,1fr));
+
+    gap:18px;
+
+    margin-top:60px;
+
+    z-index:2;
+}
+
+.landing-stat-card{
+
+    background:rgba(255,255,255,0.06);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    border-radius:22px;
+
+    padding:22px;
+
+    backdrop-filter:blur(18px);
+
+        transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+body.light .landing-stat-card{
+
+    background:rgba(255,255,255,0.52);
+}
+
+.landing-stat-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+        0 18px 50px rgba(0,0,0,0.22);
+}
+
+.landing-stat-label{
+
+    font-size:11px;
+
+    letter-spacing:1px;
+
+    color:#94a3b8;
+
+    margin-bottom:12px;
+}
+
+.landing-stat-value{
+
+    font-size:2rem;
+
+    font-weight:800;
+    font-variant-numeric:
+        tabular-nums;
+
+    letter-spacing:0.5px;
+}
+
+

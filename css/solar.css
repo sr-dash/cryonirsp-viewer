@@ -1,0 +1,31 @@
+/* =====================================================
+   SOLAR FOOTPRINT
+===================================================== */
+
+.solar-preview{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:12px;
+    margin-bottom:10px;
+}
+
+.solar-preview svg{
+    width:min(100%,420px);
+    height:auto;
+    aspect-ratio:1;
+}
+
+@keyframes pulseFootprint{
+
+    0%{opacity:0.65;}
+
+    50%{opacity:1;}
+
+    100%{opacity:0.65;}
+}
+
+.solar-preview polygon{
+
+    animation:pulseFootprint 4s ease-in-out infinite;
+}
