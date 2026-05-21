@@ -42,11 +42,6 @@ body.light .mobile-menu-toggle {
     transition: opacity 0.4s ease;
 }
 
-/* Hide toggle when in landing mode */
-body.landing-mode .mobile-menu-toggle {
-    display: none !important;
-}
-
 /* ------------------------------------
    TABLET & SMALL DESKTOP (Max 1000px)
 ------------------------------------ */
@@ -108,61 +103,77 @@ body.landing-mode .mobile-menu-toggle {
    MOBILE PHONES (Max 640px)
 ------------------------------------ */
 @media(max-width: 640px) {
-    
-    /* Dataset & Details Tightening */
-    .hero {
-        border-radius: 20px;
-        padding: 20px; 
-    }
-    
-    .section {
-        padding: 16px;
-        border-radius: 18px;
-        margin-top: 16px;
-    }
-
-    .cards {
-        grid-template-columns: 1fr; /* Stack detail cards */
-        gap: 12px;
-    }
-
-    .card {
-        padding: 14px;
-    }
-
-    /* Media Scaling Fixes */
-    .context-media-header {
-        padding: 12px 14px;
-    }
-
-    .context-media-content {
-        padding: 12px;
-    }
-
-    /* Landing Page Mobile Fixes */
+    /* 1. Landing Hero & Typography Fixes */
     .landing-hero {
-        padding: 24px;
+        padding: 20px 16px; /* Reduced side padding */
         border-radius: 0;
         min-height: 100dvh;
+        overflow-y: auto; /* Allows scrolling if content is taller than screen */
+        justify-content: center; 
+        gap: 20px;
     }
     
     .landing-title {
-        font-size: 2.5rem;
+        /* Drop the minimum size from 3.15rem to 2.2rem */
+        font-size: clamp(2.2rem, 9vw, 3rem);
+        line-height: 1.1;
+        margin-bottom: 16px;
     }
 
+    .landing-subtitle {
+        font-size: 0.95rem;
+    }
+
+    /* 2. Stats Grid Tightening */
     .landing-stats {
         grid-template-columns: 1fr 1fr;
+        gap: 10px; /* Reduced from 18px */
+        margin-top: 30px;
+        width: 100%;
+    }
+
+    .landing-stat-card {
+        padding: 14px; /* Reduced from 22px to fit side-by-side */
+    }
+
+    .landing-stat-value {
+        font-size: 1.6rem; /* Scale down the giant numbers */
+    }
+
+    /* 3. Last Updated Tag Scaling */
+    .landing-last-updated {
+        font-size: 10px;
+        padding: 8px 12px;
+        bottom: 16px;
+        right: 16px;
+    }
+
+    /* 4. Enlarge the Solar Animation on Mobile */
+    .solar-arc-container {
+        transform: scale(1.8) translateY(-5%);
+        transform-origin: center center;
+    }
+    
+    /* Ensure action button container doesn't overflow */
+    .landing-actions {
+        margin-top: 24px;
     }
 }
 
 /* ------------------------------------
    SMALL PHONES (Max 400px)
 ------------------------------------ */
+/* Very Small Phones */
 @media(max-width: 400px) {
     .landing-stats {
-        grid-template-columns: 1fr; 
+        /* Force 2 columns even on tiny phones to prevent massive vertical scrolling */
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px;
     }
-    .main {
-        padding: 14px; /* Less padding to maximize reading area */
+    .landing-stat-card {
+        padding: 10px;
+    }
+    .landing-stat-value {
+        font-size: 1.3rem;
     }
 }
