@@ -234,7 +234,7 @@ function renderLandingOverview(){
             <div class="landing-stat-card">
 
                 <div class="landing-stat-label">
-                    SPECTROMETRIC
+                    SPECTROSCOPIC
                 </div>
 
                 <div class="landing-stat-value mono">
