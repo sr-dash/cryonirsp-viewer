@@ -183,6 +183,22 @@ function renderLandingOverview(){
 
                 </div>
 
+                <div class="landing-disclaimer">
+
+                    Context images and movies courtesy of
+                    Tom Schad (NSO). Original datasets are
+                    available through the
+                    <a
+                        href="https://dkist.data.nso.edu/"
+                        target="_blank"
+                    >
+                        DKIST Data Center
+                    </a>.
+                    Optimized for large screens.
+                    Additional features and updates are planned.
+
+                </div>
+
 
                 <!-- ================================= -->
                 <!-- ACTION BUTTON -->
