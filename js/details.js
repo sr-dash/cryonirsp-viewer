@@ -12,13 +12,18 @@ function renderDatasetDetails(){
         ? `cn_daily_context_figures/${d.context_image}`
         : null;
 
-    const contextMoviePath = d.context_movie
-        ? `cn_daily_movies/${d.context_movie}`
-        : null;
+    const MEDIA_BASE =
+        'https://github.com/sr-dash/cryonirsp-media/releases/download/media-v1/';
 
-    const contextMovieThumbnail = d.context_movie_thumbnail
-        ? `cn_daily_movies/${d.context_movie_thumbnail}`
-        : null;
+    function mediaURL(filename) {
+        return filename ? MEDIA_BASE + filename : null;
+    }
+
+    const contextMoviePath =
+    mediaURL(d.context_movie);
+
+    const contextMovieThumbnail =
+        mediaURL(d.context_movie_thumbnail);
 
     const panel = document.getElementById('detailsPanel');
 
