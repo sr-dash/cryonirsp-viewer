@@ -76,9 +76,12 @@ body.light .mobile-menu-toggle {
         box-shadow: 20px 0 50px rgba(0,0,0,0.5);
     }
 
-    /* Active State (Triggered via JS) */
-    body.sidebar-open .sidebar {
+    /* Active State (Triggered via JS) - Overrides landing mode */
+    body.sidebar-open .sidebar,
+    body.landing-mode.sidebar-open .sidebar {
         transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
     }
     
     body.sidebar-open .sidebar-overlay {
