@@ -1,38 +1,98 @@
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE MODIFICATIONS
 ===================================================== */
 
-@media(max-width:1000px){
-
-    .app{
-        grid-template-columns:1fr;
+/* ------------------------------------
+   TABLET & SMALL DESKTOP (Max 1000px)
+------------------------------------ */
+@media(max-width: 1000px) {
+    .app {
+        /* Switch from side-by-side to stacked */
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr; 
+        height: 100dvh; /* Prevents mobile URL bar clipping */
     }
 
-    .sidebar{
-        height:45vh;
+    /* Fix landing mode layout for stacked view */
+    body.landing-mode .app {
+        grid-template-rows: 0 1fr;
     }
 
-    .main{
-        padding:14px;
+    .sidebar {
+        height: 45vh; /* or use a fixed pixel value like 350px */
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .main {
+        padding: 16px;
     }
 }
 
-@media(max-width:640px){
+/* ------------------------------------
+   LARGE PHONES & TABLETS (Max 900px)
+------------------------------------ */
+@media(max-width: 900px) {
+    .context-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
 
-    .sidebar-header{
-        flex-direction:column;
-        align-items:flex-start;
+/* ------------------------------------
+   MOBILE PHONES (Max 640px)
+------------------------------------ */
+@media(max-width: 640px) {
+    
+    /* Stop minmax values from breaking the viewport width */
+    .dataset-grid {
+        grid-template-columns: 1fr; 
     }
 
-    .stats{
-        grid-template-columns:1fr 1fr;
+    /* Reorganize sidebar for tight spaces */
+    .sidebar-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px;
     }
 
-    .hero{
-        border-radius:18px;
+    .stats {
+        grid-template-columns: 1fr 1fr;
     }
 
-    .cards{
-        grid-template-columns:1fr;
+    .hero {
+        border-radius: 18px;
+        padding: 24px; /* Scaled down from clamp */
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Fix the massive landing page padding */
+    .landing-hero {
+        padding: 24px;
+        border-radius: 0; /* Often looks better flush on mobile */
+        min-height: 100dvh;
+    }
+    
+    .landing-title {
+        font-size: 2.5rem; /* Prevent massive text clipping */
+    }
+
+    .landing-stats {
+        grid-template-columns: 1fr 1fr; /* 2x2 grid instead of row */
+    }
+}
+
+/* ------------------------------------
+   SMALL PHONES (Max 400px)
+------------------------------------ */
+@media(max-width: 400px) {
+    .landing-stats {
+        grid-template-columns: 1fr; /* Stack stats on tiny screens */
+    }
+    
+    .sidebar {
+        height: 50vh; /* Give slightly more room for touch targets */
     }
 }

@@ -142,7 +142,8 @@ body.light .landing-overlay{
 
     max-width:760px;
 
-    z-index:2;
+    position:relative;
+    z-index:10;
 }
 
 .landing-kicker{
@@ -160,7 +161,7 @@ body.light .landing-overlay{
 
 .landing-title{
 
-    font-size:clamp(3.5rem,6vw,6rem);
+    font-size:clamp(3.15rem,5vw,5rem);
     letter-spacing:-0.06em;
     line-height:1.05;
 
@@ -179,10 +180,10 @@ body.light .landing-title{
 }
 
 .landing-subtitle{
-    margin-top:24px;
+    margin-top:20px;
     font-size:1.05rem;
 
-    line-height:1.9;
+    line-height:1.5;
 
     max-width:720px;
 
@@ -191,6 +192,42 @@ body.light .landing-title{
 
 body.light .landing-subtitle{
     color:#334155;
+}
+
+/* =====================================================
+   LANDING DISCLAIMER
+===================================================== */
+
+.landing-disclaimer{
+
+    margin-top:18px;
+
+    padding:14px 18px;
+
+    max-width:760px;
+
+    font-size:0.92rem;
+
+    line-height:1.65;
+
+    color:#94a3b8;
+
+    background:rgba(255,255,255,0.035);
+
+    border-left:3px solid #f59e0b;
+
+    border-radius:12px;
+
+    backdrop-filter:blur(4px);
+}
+
+body.light .landing-disclaimer{
+
+    color:#475569;
+
+    background:rgba(15,23,42,0.04);
+
+    border-left:3px solid #d97706;
 }
 
 /* ===================================================== */
@@ -279,7 +316,8 @@ body.light .landing-btn.secondary{
 
     margin-top:60px;
 
-    z-index:2;
+    position:relative;
+    z-index:10;
 }
 
 .landing-stat-card{
