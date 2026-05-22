@@ -53,13 +53,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event Delegation: Close menu when ANY dataset item is clicked
+    /* =========================================================
+       EVENT DELEGATION: Auto-close sidebar on mobile
+    ========================================================= */
+
     document.addEventListener('click', (e) => {
-        // Check if the click target or its parent is a dataset item
-        const datasetItem = e.target.closest('.dataset-item');
+        // Only close when a final dataset selection is made
+        const isDataset = e.target.closest('.dataset-item');
         
-        if (datasetItem && window.innerWidth <= 1000) {
+        if (isDataset && window.innerWidth <= 1000) {
             body.classList.remove('sidebar-open');
         }
     });
+
+    // NOTE: We intentionally do NOT close the sidebar on search input (keydown)
+    // or sorting (change) so the user can see the updated list in the sidebar.
 });
