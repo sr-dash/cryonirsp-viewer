@@ -1,5 +1,5 @@
 document.getElementById('searchBox')
-    .addEventListener('input',(e)=>{
+    .addEventListener('input',()=>{
 
         renderTree();
 
@@ -15,7 +15,7 @@ document.getElementById('searchBox')
     });
 
 document.getElementById('typeFilter')
-    .addEventListener('change',(e)=>{
+    .addEventListener('change',()=>{
 
         renderTree();
 
@@ -25,7 +25,7 @@ document.getElementById('typeFilter')
     });
 
 document.getElementById('sortMode')
-    .addEventListener('change',(e)=>{
+    .addEventListener('change',()=>{
 
         renderTree();
 
