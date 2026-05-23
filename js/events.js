@@ -1,37 +1,31 @@
 /* =========================================================
    GLOBAL DELEGATION FOR FILTERS 
-   (Fixes mobile listeners and duplicate ID issues)
 ========================================================= */
 
-// 1. Handle Text Search (Input event)
+// 1. Handle Text Search (with Debouncing to prevent freezing)
+let searchTimeout; // Define timer variable outside the event
+
 document.addEventListener('input', (e) => {
-    // Check if the element the user typed in has the ID 'searchBox'
     if (e.target && e.target.id === 'searchBox') {
-        
-        // Mobile UX Fix: Save cursor position in case renderTree steals focus
-        const selectionStart = e.target.selectionStart; 
         const val = e.target.value;
 
-        renderTree();
+        // Clear the previous timer on every keystroke
+        clearTimeout(searchTimeout);
 
-        if (val.trim() === '') {
-            activeDataset = null;
-            renderLandingOverview();
-        }
+        // Wait 300ms after the user stops typing before running heavy tasks
+        searchTimeout = setTimeout(() => {
+            renderTree();
 
-        // Restore focus to the mobile keyboard so it doesn't close while typing
-        const freshInput = document.getElementById('searchBox');
-        if (freshInput) {
-            freshInput.focus();
-            freshInput.value = val;
-            freshInput.setSelectionRange(selectionStart, selectionStart);
-        }
+            if (val.trim() === '') {
+                activeDataset = null;
+                renderLandingOverview();
+            }
+        }, 300);
     }
 });
 
 // 2. Handle Dropdowns (Change event)
 document.addEventListener('change', (e) => {
-    // Check if the element the user changed is one of our filters
     if (e.target && (e.target.id === 'typeFilter' || e.target.id === 'sortMode')) {
         renderTree();
         activeDataset = null;
@@ -65,9 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (e) => {
         const datasetItem = e.target.closest('.dataset-item');
         
-        // Only close the sidebar if they clicked an actual dataset to view it
         if (datasetItem && window.innerWidth <= 1000) {
-            body.classList.remove('sidebar-open');
+            // Delay closing the sidebar by 200ms to allow the click to register!
+            setTimeout(() => {
+                body.classList.remove('sidebar-open');
+            }, 200);
         }
     });
 });
