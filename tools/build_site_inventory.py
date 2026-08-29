@@ -313,6 +313,12 @@ def main():
     ap.add_argument("--movie-dir", default="cn_daily_movies")
     ap.add_argument("--pretty", action="store_true",
                     help="indent the output (default is minified for publishing)")
+    ap.add_argument("--check-against", metavar="PUBLISHED",
+                    help="compare the rebuild to an existing published file and exit non-zero "
+                         "if the DATASET CONTENT differs; writes nothing. Provenance fields "
+                         "(generated_at, source) are ignored, because the generator stamps a new "
+                         "build time on every run and a byte comparison would report drift that "
+                         "does not exist.")
     args = ap.parse_args()
 
     try:
@@ -375,6 +381,39 @@ def main():
     )
     payload["dataset_aliases"] = aliases
     payload["datasets"] = datasets
+
+    if args.check_against:
+        try:
+            with open(args.check_against) as fh:
+                published = json.load(fh)
+        except (FileNotFoundError, json.JSONDecodeError) as exc:
+            print(f"error: cannot read {args.check_against}: {exc}", file=sys.stderr)
+            return 2
+
+        drift = []
+        if set(published.get("datasets", {})) != set(datasets):
+            only_new = set(datasets) - set(published.get("datasets", {}))
+            only_old = set(published.get("datasets", {})) - set(datasets)
+            drift.append(f"dataset ids differ (+{len(only_new)} / -{len(only_old)})")
+        else:
+            changed = [k for k in datasets
+                       if datasets[k] != published["datasets"][k]]
+            if changed:
+                drift.append(f"{len(changed)} records changed, e.g. {changed[:3]}")
+
+        if published.get("dataset_aliases", {}) != aliases:
+            drift.append("alias index differs")
+
+        if drift:
+            print("STALE — rebuilding produces different content:")
+            for d in drift:
+                print(f"  {d}")
+            return 1
+
+        print(f"CURRENT — {args.check_against} matches a fresh rebuild "
+              f"({len(datasets)} datasets, {len(aliases)} aliases).")
+        print("           provenance fields (generated_at, source) not compared")
+        return 0
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
     with open(args.output, "w") as fh:

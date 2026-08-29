@@ -63,13 +63,22 @@ jobs:
 
       # Catches drift between the generator's output and what is committed:
       # if rebuilding produces a different file, the published copy is stale.
+      # Only meaningful when the generator repo happens to sit alongside this
+      # one, which is the local case. CI does not check it out, so this is a
+      # deliberate no-op there rather than a skipped step. (hashFiles() cannot
+      # be used here: it throws on any path outside the workspace.)
       - name: Check published inventory is current
-        if: hashFiles('../CryoNIRSP-Datasets/cryonirsp_inventory.json') != ''
         run: |
-          python3 tools/build_site_inventory.py \
-            ../CryoNIRSP-Datasets/cryonirsp_inventory.json \
-            -o /tmp/rebuilt.json
-          if ! diff -q /tmp/rebuilt.json data/cryonirsp_dataset_details.json >/dev/null; then
+          SRC=../CryoNIRSP-Datasets/cryonirsp_inventory.json
+          if [ ! -f "$SRC" ]; then
+            echo "Generator inventory not present — skipping the rebuild check."
+            exit 0
+          fi
+          # Content comparison, not a byte diff: the generator stamps a new
+          # build time on every run, so identical data produces a different
+          # file and a byte diff would report drift that does not exist.
+          if ! python3 tools/build_site_inventory.py "$SRC" \
+                 --check-against data/cryonirsp_dataset_details.json; then
             echo "::error::data/cryonirsp_dataset_details.json is stale — re-run tools/build_site_inventory.py"
             exit 1
           fi
