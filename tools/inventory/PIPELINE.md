@@ -130,6 +130,16 @@ check whether the schedule was switched off before looking anywhere else.
 **The tag scraper parses someone else's HTML.** When that page changes shape
 the tags become zero rather than raising. The delta check is what catches it.
 
+**Uploading media needs a token this workflow does not have by default.**
+The figures and movies live in a release on `sr-dash/cryonirsp-media`, a
+separate repository, because 2.5 GB of imagery has no business in the site
+repo's release list. The default job token can *read* that release, since it
+is public, but it cannot write to another repository. Without a `MEDIA_TOKEN`
+secret carrying write access there, a run that finds new imagery will say so
+and carry on without uploading it — those observing days show as awaiting
+imagery until someone syncs the media by hand. Everything else about the run
+is unaffected.
+
 **`share.nso.edu` is not reliably up.** The media step is allowed to fail; the
 build then references only what the release already holds. New observing days
 simply arrive without imagery until a later run picks them up.
