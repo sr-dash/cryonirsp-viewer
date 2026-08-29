@@ -134,11 +134,25 @@ the tags become zero rather than raising. The delta check is what catches it.
 The figures and movies live in a release on `sr-dash/cryonirsp-media`, a
 separate repository, because 2.5 GB of imagery has no business in the site
 repo's release list. The default job token can *read* that release, since it
-is public, but it cannot write to another repository. Without a `MEDIA_TOKEN`
-secret carrying write access there, a run that finds new imagery will say so
-and carry on without uploading it — those observing days show as awaiting
-imagery until someone syncs the media by hand. Everything else about the run
-is unaffected.
+is public, but it cannot write to another repository. That is what the
+`MEDIA_TOKEN` secret is for: a fine-grained personal access token scoped to
+`sr-dash/cryonirsp-media` alone, with Contents set to read and write. Nothing
+else needs to be granted, and it should not be scoped to any other repository.
+
+**That token expires, and the expiry will not announce itself.** Fine-grained
+tokens last at most a year. The run checks the credential before relying on
+it and reports one of four states — `ok`, `absent`, `readonly`, `invalid` —
+and anything other than `ok` is a warning rather than a failure: the run
+continues, the pull request still opens, and only the imagery is left behind.
+Those observing days show as awaiting imagery until the token is replaced and
+a later run picks the files up. Losing a month of pictures should not cost a
+month of metadata.
+
+To replace it: generate a new fine-grained token as above, then
+
+    gh secret set MEDIA_TOKEN --repo sr-dash/cryonirsp-viewer
+
+and dispatch a run; the credential step states plainly whether it took.
 
 **`share.nso.edu` is not reliably up.** The media step is allowed to fail; the
 build then references only what the release already holds. New observing days
