@@ -46,10 +46,17 @@ export const TAG_CATEGORY_LABEL = {
     reference: 'Reference'
 };
 
+// Named as the instrument team names them. The polarimetric context-imager
+// mode is split by passband: 42 of those products are Fe XIII, not He I, so a
+// single "He I polarimetry" row would repeat the conflation this replaced.
 export const MODE_LABEL = {
     spectroscopy: 'Spectroscopy',
     spectropolarimetry: 'Spectropolarimetry',
-    context_imaging: 'Context imaging',
+    ci: 'CI',
+    ci_pol_hei_1083: 'He I polarimetry',
+    ci_pol_fexiii_1074: 'Fe XIII polarimetry',
+    // legacy keys, in case an older inventory is loaded
+    context_imaging: 'CI',
     context_imaging_polarimetry: 'CI polarimetry'
 };
 
@@ -163,6 +170,11 @@ export async function loadArchive() {
             proposal: d.proposal_id,
 
             line: d.waveband_key,
+            // What the spectrograph dispersed, versus what the context imager
+            // imaged through. Never the same measurement, so never one facet.
+            spectralLine: d.spectral_line || null,
+            filterPassband: d.filter_passband || null,
+            modeKey: d.mode_key || d.observing_mode,
             lineLabel: d.waveband,
             lineWave: num(d.line_wave),
 

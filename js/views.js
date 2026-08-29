@@ -61,9 +61,10 @@ function lockGlyph(r) {
 // -----------------------------------------------------
 
 export const FACETS = {
-    line:   ['hei_1083', 'fexiii_1074', 'fexiii_1079', 'six_1430'],
+    line:   ['fexiii_1074', 'fexiii_1079', 'hei_1083', 'six_1430'],
+    filter: ['hei_1083', 'fexiii_1074'],
     target: ['activecorona', 'unknown', 'prominence', 'quietcorona', 'coronalhole'],
-    mode:   ['spectroscopy', 'context_imaging', 'spectropolarimetry', 'context_imaging_polarimetry'],
+    mode:   ['spectroscopy', 'spectropolarimetry', 'ci', 'ci_pol_hei_1083', 'ci_pol_fexiii_1074'],
     stokes: ['I', 'IQUV'],
     rbin:   ['near', 'far', 'limb', 'disk'],
     use:    ['fit', 'ctx'],
@@ -91,6 +92,7 @@ export const TAG_CATEGORIES = new Set(Object.keys(TAG_CATEGORY_LABEL));
 
 export const LABELS = {
     line: LINE_SHORT,
+    filter: LINE_SHORT,
     target: TARGET_LABEL,
     mode: MODE_LABEL,
     stokes: { I: 'Stokes I only', IQUV: 'Full Stokes IQUV' },
@@ -239,7 +241,7 @@ export function renderResults(el, rows, opts) {
                 <span class="tgt">${esc(TARGET_LABEL[r.target] || r.target)} <em>· ${esc(MODE_LABEL[r.mode] || r.mode || '')}</em></span>
             </span>
             <span class="m">${esc(r.date)}</span>
-            <span class="m" style="color:${esc(lineColor(r.line))}">${esc(LINE_SHORT[r.line] || r.lineLabel || '')}</span>
+            <span class="m" style="color:${esc(lineColor(r.line))}">${esc(LINE_SHORT[r.line] || r.lineLabel || '')}${r.filterPassband ? '<span class="viaFilter">filter</span>' : ''}</span>
             <span class="m">${r.r !== null ? `${r.r.toFixed(2)} · ${String(Math.round(r.pa)).padStart(3, '0')}°` : '—'}</span>
             <span class="m">${esc(fmtDuration(r.durationSeconds))}</span>
             <span class="m">${esc(fmtSize(r.sizeGiB))}</span>
@@ -281,57 +283,17 @@ export function renderDetail(el, r) {
         <div class="dbody">
             <div class="dsec" style="--i:0">
                 <div class="kv">
-                    ${kv('Spectral line', LINE_SHORT[r.line] || r.lineLabel || '—')}
+                    ${r.spectralLine
+                        ? kv('Spectral line', LINE_SHORT[r.spectralLine] || r.lineLabel || '—')
+                        : kv('Filter passband', (LINE_SHORT[r.filterPassband] || r.lineLabel || '—') + ' · imaged, not dispersed')}
                     ${kv('Target', TARGET_LABEL[r.target] || r.target)}
                     ${kv('Mode', MODE_LABEL[r.mode] || r.mode || '—')}
                     ${kv('Stokes', r.stokes || '—')}
                 </div>
             </div>
 
-            <div class="dsec" style="--i:1">
-                <h4>Observation</h4>
-                <div class="kv">
-                    ${kv('Start', utcStamp(r.start))}
-                    ${kv('End', utcStamp(r.end))}
-                    ${kv('Duration', fmtDuration(r.durationSeconds))}
-                    ${kv('Scan steps', r.scanSteps ?? '—')}
-                    ${kv('Shape', r.shape || '—')}
-                    ${kv('Frames', r.frames !== null ? r.frames.toLocaleString() : '—')}
-                    ${kv('Size', fmtSize(r.sizeGiB))}
-                </div>
-            </div>
-
-            <div class="dsec" style="--i:2">
-                <h4>Availability</h4>
-                ${availabilityBlock(r)}
-            </div>
-
-            ${observingDayBlock(r)}
-
-            <div class="dsec" style="--i:3">
-                <h4>Pointing</h4>
-                <div class="kv">
-                    ${kv('Radial distance', r.r !== null ? `${r.r.toFixed(3)} R☉` : '—')}
-                    ${kv('Position angle', r.pa !== null ? `${r.pa.toFixed(1)}°` : '—')}
-                    ${kv('Scan step', r.stepWidth !== null ? `${r.stepWidth.toFixed(4)}″` : 'N/A')}
-                    ${kv('Slit sampling', r.slitSampling !== null ? `${r.slitSampling.toFixed(4)}″` : 'N/A')}
-                </div>
-                ${r.bounds ? `<div style="margin-top:14px;">${footprintSVG(r)}</div>` : ''}
-            </div>
-
-            ${r.description ? `
-            <div class="dsec" style="--i:4">
-                <h4>Experiment ${esc(r.experiment || '')}</h4>
-                <div class="prose">${esc(r.description)}</div>
-            </div>` : ''}
-
-            <div class="dsec" style="--i:5">
-                <h4>Calibration lineage — ${r.superseded.length} superseded</h4>
-                <div class="lineage">${lineage}</div>
-            </div>
-
             ${(r.image || r.movie) ? `
-            <div class="dsec" style="--i:6">
+            <div class="dsec" style="--i:1">
                 <h4>Context media</h4>
                 <div class="media">
                     ${r.image ? `<figure>
@@ -344,6 +306,49 @@ export function renderDetail(el, r) {
                     </figure>` : ''}
                 </div>
             </div>` : ''}
+
+            <div class="dsec" style="--i:2">
+                <h4>Observation</h4>
+                <div class="kv">
+                    ${kv('Start', utcStamp(r.start))}
+                    ${kv('End', utcStamp(r.end))}
+                    ${kv('Duration', fmtDuration(r.durationSeconds))}
+                    ${kv('Scan steps', r.scanSteps ?? '—')}
+                    ${kv('Shape', r.shape || '—')}
+                    ${kv('Frames', r.frames !== null ? r.frames.toLocaleString() : '—')}
+                    ${kv('Size', fmtSize(r.sizeGiB))}
+                </div>
+            </div>
+
+            <div class="dsec" style="--i:3">
+                <h4>Availability</h4>
+                ${availabilityBlock(r)}
+            </div>
+
+            ${observingDayBlock(r)}
+
+            <div class="dsec" style="--i:4">
+                <h4>Pointing</h4>
+                <div class="kv">
+                    ${kv('Radial distance', r.r !== null ? `${r.r.toFixed(3)} R☉` : '—')}
+                    ${kv('Position angle', r.pa !== null ? `${r.pa.toFixed(1)}°` : '—')}
+                    ${kv('Scan step', r.stepWidth !== null ? `${r.stepWidth.toFixed(4)}″` : 'N/A')}
+                    ${kv('Slit sampling', r.slitSampling !== null ? `${r.slitSampling.toFixed(4)}″` : 'N/A')}
+                </div>
+                ${r.bounds ? `<div style="margin-top:14px;">${footprintSVG(r)}</div>` : ''}
+            </div>
+
+            ${r.description ? `
+            <div class="dsec" style="--i:5">
+                <h4>Experiment ${esc(r.experiment || '')}</h4>
+                <div class="prose">${esc(r.description)}</div>
+            </div>` : ''}
+
+            <div class="dsec" style="--i:6">
+                <h4>Calibration lineage — ${r.superseded.length} superseded</h4>
+                <div class="lineage">${lineage}</div>
+            </div>
+
 
             <div class="dsec" style="--i:7">
                 <h4>Archive</h4>
@@ -393,7 +398,7 @@ function observingDayBlock(r) {
         : `<span class="pub">${esc(p.label)}</span>`).join('');
 
     return `
-        <div class="dsec" style="--i:2">
+        <div class="dsec" style="--i:8">
             <h4>Observing day${r.observingDate ? ` — ${esc(r.observingDate)} HST` : ''}</h4>
             ${issues}
             ${tags ? `<div class="tagset"${issues ? ' style="margin-top:10px"' : ''}>${tags}</div>` : ''}

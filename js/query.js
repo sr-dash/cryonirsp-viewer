@@ -7,9 +7,10 @@
 ===================================================== */
 
 export const GROUPS = [
-    { id: 'line',   name: 'Spectral line',   field: 'line' },
+    { id: 'line',   name: 'Spectral line',   field: 'spectralLine' },
+    { id: 'filter', name: 'Filter passband',  field: 'filterPassband' },
     { id: 'target', name: 'Target',          field: 'target' },
-    { id: 'mode',   name: 'Observing mode',  field: 'mode' },
+    { id: 'mode',   name: 'Observing mode',  field: 'modeKey' },
     { id: 'stokes', name: 'Polarisation',    field: 'stokes' },
     { id: 'rbin',   name: 'Radial position', field: 'rbin' },
     { id: 'use',    name: 'Ready for',       field: null },
@@ -204,7 +205,7 @@ export function fromParams(params) {
 // -----------------------------------------------------
 
 const FIELD_TO_GROUP = {
-    line: 'line', target: 'target', mode: 'mode',
+    line: 'line', filter: 'filter', target: 'target', mode: 'mode',
     stokes: 'stokes', pos: 'rbin', available: 'avail', avail: 'avail',
     tag: 'tag', category: 'tag', has: 'note'
 };

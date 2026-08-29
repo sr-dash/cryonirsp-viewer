@@ -242,9 +242,29 @@ def build_record(product, available, stats):
     record["duration_seconds"] = duration_seconds(structure, start, end)
 
     # ---- spectral (tier A) ----
+    # The spectrograph disperses a line; the context imager images through a
+    # narrowband filter. The generator reports both as primary_line, which
+    # merged 403 He I imager frames into the 52 real He I spectrograph
+    # observations. They are different measurements and are split here.
+    arm = classification.get("arm")
+    key = waveband_key(primary_line, classification.get("fit_line"))
+
     record["waveband"] = primary_line.get("raw")
     record["line_wave"] = num(primary_line.get("wavelength_nm"))
-    record["waveband_key"] = waveband_key(primary_line, classification.get("fit_line"))
+    record["waveband_key"] = key
+    record["spectral_line"] = key if arm == "SP" else None
+    record["filter_passband"] = key if arm == "CI" else None
+
+    # Observing mode, named the way the instrument team names it. The
+    # polarimetric context-imager mode is named for the passband it was taken
+    # in, because 42 of those 183 products are Fe XIII, not He I.
+    mode = classification.get("observing_mode")
+    if mode == "context_imaging":
+        record["mode_key"] = "ci"
+    elif mode == "context_imaging_polarimetry":
+        record["mode_key"] = f"ci_pol_{key}" if key else "ci_pol"
+    else:
+        record["mode_key"] = mode
 
     # ---- geometry (tier A when enriched) ----
     record["solar_radius_arcsec"] = first(
@@ -490,6 +510,10 @@ def main():
           f"{stats['unenriched']} awaiting enrichment")
     print(f"media      {stats['with_media']} with context media, "
           f"{stats['without_media']} without")
+
+    sp = sum(1 for r in datasets.values() if r.get("spectral_line"))
+    ci = sum(1 for r in datasets.values() if r.get("filter_passband"))
+    print(f"arms       {sp} spectrograph (spectral line), {ci} context imager (filter)")
 
     tagged = sum(1 for r in datasets.values() if r.get("tag_names"))
     vocab = sorted({t for r in datasets.values() for t in (r.get("tag_names") or [])})

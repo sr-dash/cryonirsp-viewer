@@ -68,6 +68,18 @@ are 94 of them and they are operational notes rather than warnings about the fra
 **Calibration lineage is visible.** The `Cal` column counts superseded dataset IDs; the detail panel
 lists them with status. Any of the 1,692 old IDs resolves to its current product.
 
+**The spectrograph and the context imager are kept apart.** The generator reports both arms'
+wavelength as `primary_line`, which merged 403 context-imager frames taken through a He I filter
+into the 52 genuine He I spectrograph observations — filtering for He I spectropolarimetry returned
+455 records of which 23 were what you asked for. They are different measurements, so they are
+different facets now: **Spectral line** covers the 548 spectrograph products, **Filter passband**
+the 454 imager ones, and a context-imager row is marked `filter` in the results list.
+
+The observing modes are named accordingly: `Spectroscopy`, `Spectropolarimetry`, `CI`, and the
+polarimetric imager mode split by passband into `He I polarimetry` (141) and `Fe XIII polarimetry`
+(42) — a single He I row would have repeated the same conflation, since a fifth of those products
+are Fe XIII.
+
 **Colour encodes the spectral line** in every view. The two Fe XIII lines are visual siblings —
 same ion, the density-ratio pair. The hues are redefined for the light theme so the encoding stays
 legible on a pale ground as well as a dark one, and none of the four is the interface accent, so a
