@@ -194,6 +194,36 @@ jobs:
       # not always up, so a failure here must not fail the run — the build
       # simply will not reference media it cannot confirm exists.
       # ---------------------------------------------------------------
+      # An expired credential and an absent one should behave identically:
+      # the run continues and the imagery simply is not refreshed. Fine-grained
+      # tokens expire within the year, and letting that turn a routine month
+      # into a failed job would be a poor trade for a credential whose only
+      # job is to copy pictures across. Checked here, up front, so the reason
+      # is stated plainly rather than surfacing as a confusing upload error.
+      - name: Check the media credential
+        id: mediacred
+        env:
+          MEDIA_TOKEN: ${{ secrets.MEDIA_TOKEN }}
+        run: |
+          if [ -z "$MEDIA_TOKEN" ]; then
+            echo "state=absent" >> "$GITHUB_OUTPUT"
+            echo "No MEDIA_TOKEN secret is set; newly published imagery cannot be uploaded."
+            exit 0
+          fi
+
+          if perms=$(GH_TOKEN="$MEDIA_TOKEN" gh api "repos/$MEDIA_REPO" --jq '.permissions.push' 2>&1); then
+            if [ "$perms" = "true" ]; then
+              echo "state=ok" >> "$GITHUB_OUTPUT"
+              echo "MEDIA_TOKEN authenticates against $MEDIA_REPO and carries write access."
+            else
+              echo "state=readonly" >> "$GITHUB_OUTPUT"
+              echo "::warning::MEDIA_TOKEN reaches $MEDIA_REPO but reports no write access. It likely needs the Contents permission set to read and write. New imagery will not be uploaded."
+            fi
+          else
+            echo "state=invalid" >> "$GITHUB_OUTPUT"
+            echo "::warning::MEDIA_TOKEN was rejected by $MEDIA_REPO — expired, revoked, or scoped to the wrong repository. New imagery will not be uploaded until it is replaced."
+          fi
+
       - name: Sync new media into the release
         id: media
         continue-on-error: true
@@ -239,16 +269,15 @@ jobs:
           done < want.txt
 
           n=$(ls media 2>/dev/null | wc -l | tr -d ' ')
-          if [ "$n" -gt 0 ]; then
-            if [ -n "${{ secrets.MEDIA_TOKEN }}" ]; then
-              GH_TOKEN='${{ secrets.MEDIA_TOKEN }}' \
-                gh release upload "$MEDIA_TAG" --repo "$MEDIA_REPO" media/* --clobber
-              echo "uploaded $n new or regenerated assets"
-            else
-              echo "::warning::$n media files are new or changed, but no MEDIA_TOKEN secret is set, so they cannot be uploaded to $MEDIA_REPO. Those observing days will show as awaiting imagery until the media is synced."
-            fi
-          else
+          if [ "$n" -eq 0 ]; then
             echo "media already current"
+          elif [ "${{ steps.mediacred.outputs.state }}" != "ok" ]; then
+            echo "::warning::$n media files are new or changed, but the media credential is ${{ steps.mediacred.outputs.state }}, so they cannot be uploaded to $MEDIA_REPO. Those observing days will show as awaiting imagery until the media is synced."
+          elif GH_TOKEN='${{ secrets.MEDIA_TOKEN }}' \
+                 gh release upload "$MEDIA_TAG" --repo "$MEDIA_REPO" media/* --clobber; then
+            echo "uploaded $n new or regenerated assets"
+          else
+            echo "::warning::$n media files are new or changed, but uploading them to $MEDIA_REPO failed. Those observing days will show as awaiting imagery until the media is synced."
           fi
 
           gh release view "$MEDIA_TAG" --repo "$MEDIA_REPO" --json assets --jq '.assets[].name' > media-manifest.txt
