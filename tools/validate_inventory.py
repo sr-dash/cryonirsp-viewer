@@ -363,9 +363,14 @@ def check_record(key, rec, rep):
     }
 
 
-def check_media(summaries, image_dir, movie_manifest, rep):
+def check_media(summaries, image_dir, movie_manifest, rep, media_names=None):
     """Verify every referenced media file actually resolves."""
-    if image_dir:
+    if media_names is not None:
+        for s in summaries:
+            if s["image"] and s["image"] not in media_names:
+                rep.error("media:image-missing",
+                          f"context_image {s['image']!r} is not in the media manifest")
+    elif image_dir:
         if not os.path.isdir(image_dir):
             rep.error("media:image-dir", f"image dir not found: {image_dir}")
         else:
@@ -446,6 +451,10 @@ def main():
     ap.add_argument("--image-dir", help="directory that must contain every context_image")
     ap.add_argument("--movie-manifest",
                     help="file listing the media release's asset names, one per line")
+    ap.add_argument("--media-manifest", metavar="FILE",
+                    help="one list covering BOTH images and movies. CI has no media on "
+                         "disk, so it passes the release's asset list here instead of a "
+                         "directory that does not exist.")
     ap.add_argument("--strict", action="store_true",
                     help="treat warnings as errors")
     ap.add_argument("--max-examples", type=int, default=5,
@@ -464,6 +473,19 @@ def main():
         print(f"error: {args.inventory} is not valid JSON: {exc}", file=sys.stderr)
         return 2
 
+    # One manifest answers for both kinds; the filename families differ by prefix.
+    if args.media_manifest:
+        args.movie_manifest = args.media_manifest
+        args.image_dir = None
+        try:
+            with open(args.media_manifest) as fh:
+                media_names = {line.strip() for line in fh if line.strip()}
+        except FileNotFoundError:
+            print(f"error: no such manifest: {args.media_manifest}", file=sys.stderr)
+            return 2
+    else:
+        media_names = None
+
     rep = Report(max_examples=args.max_examples)
 
     records, meta = unwrap(payload, rep)
@@ -474,7 +496,7 @@ def main():
         if s:
             summaries.append(s)
 
-    check_media(summaries, args.image_dir, args.movie_manifest, rep)
+    check_media(summaries, args.image_dir, args.movie_manifest, rep, media_names)
 
     if not summaries:
         rep.error("empty", "no valid dataset records found")

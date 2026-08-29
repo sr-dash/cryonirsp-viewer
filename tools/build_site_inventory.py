@@ -387,6 +387,11 @@ def main():
     ap.add_argument("-o", "--output", default="data/cryonirsp_dataset_details.json")
     ap.add_argument("--image-dir", default="cn_daily_context_figures")
     ap.add_argument("--movie-dir", default="cn_daily_movies")
+    ap.add_argument("--media-manifest", metavar="FILE",
+                    help="a list of media filenames, one per line, used instead of the "
+                         "two directories to decide what exists. CI has no media on disk "
+                         "and syncing 2.5 GB to answer a yes/no question would be absurd, "
+                         "so it passes the release's own asset list here.")
     ap.add_argument("--pretty", action="store_true",
                     help="indent the output (default is minified for publishing)")
     ap.add_argument("--check-against", metavar="PUBLISHED",
@@ -418,14 +423,26 @@ def main():
         print("error: source has no 'products' object", file=sys.stderr)
         return 2
 
-    available = {
-        "images": set(os.listdir(args.image_dir)) if os.path.isdir(args.image_dir) else set(),
-        "movies": set(os.listdir(args.movie_dir)) if os.path.isdir(args.movie_dir) else set(),
-    }
-    if not available["images"]:
-        print(f"warning: no images found in {args.image_dir}", file=sys.stderr)
-    if not available["movies"]:
-        print(f"warning: no movies found in {args.movie_dir}", file=sys.stderr)
+    if args.media_manifest:
+        try:
+            with open(args.media_manifest) as fh:
+                names = {line.strip() for line in fh if line.strip()}
+        except FileNotFoundError:
+            print(f"error: no such manifest: {args.media_manifest}", file=sys.stderr)
+            return 2
+        # One flat list; the three filename families are distinguishable by
+        # prefix, so the same set answers for both kinds.
+        available = {"images": names, "movies": names}
+        print(f"media       from manifest {args.media_manifest} ({len(names)} assets)")
+    else:
+        available = {
+            "images": set(os.listdir(args.image_dir)) if os.path.isdir(args.image_dir) else set(),
+            "movies": set(os.listdir(args.movie_dir)) if os.path.isdir(args.movie_dir) else set(),
+        }
+        if not available["images"]:
+            print(f"warning: no images found in {args.image_dir}", file=sys.stderr)
+        if not available["movies"]:
+            print(f"warning: no movies found in {args.movie_dir}", file=sys.stderr)
 
     stats = Counter()
     datasets = OrderedDict()

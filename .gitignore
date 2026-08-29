@@ -1,3 +1,12 @@
 cn_daily_movies/
 .DS_Store
 cn_daily_context_figures/
+
+# Generator working state. The inventory JSON is 11 MB and would make every
+# pull request unreviewable; it is carried between runs as a release asset
+# instead. The ASDF cache is disposable — enrich skips products that already
+# carry a structure block, so losing it only costs time, never correctness.
+cryonirsp_inventory.json
+cryonirsp_inventory.json.gz
+Level-1/
+media-manifest.txt

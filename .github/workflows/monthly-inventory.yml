@@ -1,0 +1,220 @@
+name: Monthly inventory update
+
+# Rebuilds the archive from the DKIST Data Center once a month and opens a
+# pull request with the result. It never pushes to main: the whole point of
+# an unattended job is that the abnormal run gets a human in front of it,
+# and a PR is where that happens.
+#
+# The pipeline is incremental. `fetch` skips ASDFs already on disk and
+# `enrich` skips products that already carry a structure block, both keyed on
+# the inventory JSON that is restored at the start of the run. A typical
+# month therefore touches a few dozen products and takes about ten minutes.
+# If the state is lost the run still succeeds — it just rebuilds everything,
+# which measured around 75 minutes against a 6 hour limit.
+
+on:
+  schedule:
+    # 06:20 UTC on the 3rd. Not midnight and not the 1st: those are the
+    # busiest slots on GitHub's scheduler and get delayed the most.
+    - cron: '20 6 3 * *'
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: 'Re-enrich every product from scratch, ignoring saved state'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: monthly-inventory
+  cancel-in-progress: false
+
+env:
+  STATE_TAG: inventory-state
+  MEDIA_TAG: media-v2
+  MEDIA_SOURCE: https://share.nso.edu/shared/dkist/tschad
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330          # under the 360 hard limit, so we fail tidily
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install the pipeline
+        run: pip install -r tools/inventory/requirements.txt
+
+      # ---------------------------------------------------------------
+      # State. The generator's own JSON is what makes the run incremental.
+      # It lives as a release asset rather than in git: it is 11 MB and
+      # would make every pull request unreviewable, which would defeat the
+      # reason we open one.
+      # ---------------------------------------------------------------
+      - name: Restore inventory state
+        if: ${{ !inputs.rebuild }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release download "$STATE_TAG" --pattern 'cryonirsp_inventory.json.gz' --clobber; then
+            gunzip -f cryonirsp_inventory.json.gz
+            python3 -c "import json;d=json.load(open('cryonirsp_inventory.json'));print(f'restored state: {d[\"n_products\"]} products, generated {d[\"generated\"]}')"
+          else
+            echo "::notice::No saved state. This run will rebuild the archive from scratch."
+          fi
+
+      # ---------------------------------------------------------------
+      # The pipeline
+      # ---------------------------------------------------------------
+      - name: Search the Data Center
+        run: python3 tools/inventory/cryonirsp-inventory search
+
+      - name: Fetch metadata for new datasets
+        run: python3 tools/inventory/cryonirsp-inventory fetch
+
+      - name: Enrich new datasets
+        run: |
+          python3 tools/inventory/cryonirsp-inventory enrich --jobs 4 \
+            ${{ inputs.rebuild && '--overwrite' || '' }}
+
+      # Observing-day tags come from a third-party summary page. When that
+      # page changes shape the tags do not error, they quietly become zero —
+      # which is exactly what the delta check refuses to let through.
+      - name: Attach observing-day tags
+        continue-on-error: true
+        run: python3 tools/inventory/cryonirsp-inventory tags
+
+      - name: Report
+        run: python3 tools/inventory/cryonirsp-inventory report
+
+      # ---------------------------------------------------------------
+      # Media. New observing days bring new figures and movies. The host is
+      # not always up, so a failure here must not fail the run — the build
+      # simply will not reference media it cannot confirm exists.
+      # ---------------------------------------------------------------
+      - name: Sync new media into the release
+        id: media
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          gh release view "$MEDIA_TAG" --json assets --jq '.assets[].name' | sort > have.txt
+          echo "release currently holds $(wc -l < have.txt) assets"
+
+          : > want.txt
+          for d in daily_context_figures cn_daily_movies; do
+            curl -sS -m 90 "$MEDIA_SOURCE/$d/" \
+              | grep -oE 'href="[^"]+\.(jpg|mp4)"' \
+              | sed -E 's/href="([^"]+)"/\1/' >> want.txt
+          done
+          sort -u want.txt -o want.txt
+          echo "source lists $(wc -l < want.txt) assets"
+
+          comm -13 have.txt want.txt > new.txt
+          echo "new assets: $(wc -l < new.txt)"
+
+          mkdir -p media
+          while read -r f; do
+            case "$f" in
+              daily_context_*) sub=daily_context_figures ;;
+              *)               sub=cn_daily_movies ;;
+            esac
+            curl -sS -m 900 --retry 3 -o "media/$f" "$MEDIA_SOURCE/$sub/$f" || rm -f "media/$f"
+          done < new.txt
+
+          if [ -n "$(ls -A media 2>/dev/null)" ]; then
+            gh release upload "$MEDIA_TAG" media/* --clobber
+            echo "uploaded $(ls media | wc -l) new assets"
+          fi
+
+          gh release view "$MEDIA_TAG" --json assets --jq '.assets[].name' > media-manifest.txt
+
+      - name: Fall back to the existing media list
+        if: steps.media.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::warning::Media sync failed; building against the release as it stands."
+          gh release view "$MEDIA_TAG" --json assets --jq '.assets[].name' > media-manifest.txt
+
+      # ---------------------------------------------------------------
+      # Build, then judge the result before offering it
+      # ---------------------------------------------------------------
+      - name: Build the site inventory
+        run: |
+          cp data/cryonirsp_dataset_details.json /tmp/previous.json
+          python3 tools/build_site_inventory.py cryonirsp_inventory.json \
+            -o data/cryonirsp_dataset_details.json \
+            --media-manifest media-manifest.txt
+
+      - name: Reject JSON the browser cannot parse
+        run: node -e "JSON.parse(require('fs').readFileSync('data/cryonirsp_dataset_details.json','utf8'))"
+
+      - name: Validate against the contract
+        run: |
+          python3 tools/validate_inventory.py data/cryonirsp_dataset_details.json \
+            --media-manifest media-manifest.txt --summary-file validate.md
+
+      - name: Check the delta for regressions
+        id: delta
+        continue-on-error: true
+        run: python3 tools/check_delta.py /tmp/previous.json data/cryonirsp_dataset_details.json --summary-file delta.md
+
+      - name: Save inventory state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gzip -kf cryonirsp_inventory.json
+          gh release view "$STATE_TAG" >/dev/null 2>&1 \
+            || gh release create "$STATE_TAG" --title "Inventory state" \
+                 --notes "Generator state carried between monthly runs. Not part of the site."
+          gh release upload "$STATE_TAG" cryonirsp_inventory.json.gz --clobber
+
+      - name: Job summary
+        if: always()
+        run: |
+          { cat validate.md 2>/dev/null; cat delta.md 2>/dev/null; } >> "$GITHUB_STEP_SUMMARY" || true
+
+      # ---------------------------------------------------------------
+      # Always a pull request, never a push to main.
+      # ---------------------------------------------------------------
+      - name: Decide how the pull request should read
+        id: pr
+        run: |
+          if [ "${{ steps.delta.outcome }}" = "success" ]; then
+            echo 'title=Monthly inventory refresh' >> "$GITHUB_OUTPUT"
+            echo 'verdict=clean' >> "$GITHUB_OUTPUT"
+            echo 'note=Counts and vocabularies look like a month of growth. Worth a glance at the numbers before merging.' >> "$GITHUB_OUTPUT"
+          else
+            echo 'title=Monthly inventory refresh — REVIEW: delta check flagged regressions' >> "$GITHUB_OUTPUT"
+            echo 'verdict=flagged regressions' >> "$GITHUB_OUTPUT"
+            echo 'note=Something regressed enough that this should not be merged without a look — the archive shrank, a vocabulary emptied, coverage collapsed, or dataset ids that used to resolve no longer would.' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open a pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: data/cryonirsp_dataset_details.json
+          branch: inventory/monthly
+          delete-branch: true
+          commit-message: "Refresh the inventory from the Data Center"
+          title: ${{ steps.pr.outputs.title }}
+          labels: inventory
+          body: |
+            Automated rebuild from the DKIST Data Center.
+
+            **Delta check: ${{ steps.pr.outputs.verdict }}**
+
+            ${{ steps.pr.outputs.note }}
+
+            Full validation and delta reports are in the [job summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).

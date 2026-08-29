@@ -56,11 +56,6 @@ jobs:
             --json assets --jq '.assets[].name' > media-assets.txt
           echo "Release $TAG lists $(wc -l < media-assets.txt) assets."
 
-          # The validator checks images against a directory, so materialise
-          # the manifest as empty files instead of downloading 2.5 GB.
-          mkdir -p .manifest-media
-          while read -r f; do : > ".manifest-media/$f"; done < media-assets.txt
-
       # Catches drift between the generator's output and what is committed:
       # if rebuilding produces a different file, the published copy is stale.
       # Only meaningful when the generator repo happens to sit alongside this
@@ -69,7 +64,7 @@ jobs:
       # be used here: it throws on any path outside the workspace.)
       - name: Check published inventory is current
         run: |
-          SRC=../CryoNIRSP-Datasets/cryonirsp_inventory.json
+          SRC=cryonirsp_inventory.json   # restored only in the monthly job
           if [ ! -f "$SRC" ]; then
             echo "Generator inventory not present — skipping the rebuild check."
             exit 0
@@ -96,7 +91,7 @@ jobs:
           ARGS="--summary-file summary.md"
 
           if [ -s media-assets.txt ]; then
-            ARGS="$ARGS --image-dir .manifest-media --movie-manifest media-assets.txt"
+            ARGS="$ARGS --media-manifest media-assets.txt"
           else
             echo "::warning::Media release unavailable — skipping the media checks."
           fi

@@ -1,0 +1,11 @@
+# Pinned deliberately. This pipeline runs unattended once a month, so a
+# breaking change in any of these should surface as a failed run that a
+# human looks at, not as a silently different inventory.
+#
+# Bump on purpose, roughly quarterly, and re-run with --overwrite once
+# afterwards so the whole archive is re-enriched by the new versions.
+dkist==1.17.0
+sunpy==7.0.3
+astropy==7.1.1
+numpy==2.2.6
+asdf==5.3.0

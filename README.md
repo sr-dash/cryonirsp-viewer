@@ -136,6 +136,14 @@ inconsistent. The rule now, applied everywhere:
 | Archivo | every label, button, column header, help string |
 | JetBrains Mono | data only — identifiers, numbers, dates, coordinates, literal query syntax |
 
+## Updating
+
+The archive rebuilds itself on the 3rd of each month and opens a pull request;
+it never pushes to `main`. The generator lives in `tools/inventory/`, and
+`tools/inventory/PIPELINE.md` covers how it runs, what state it keeps, the
+four gates a run passes before it can reach the site, and the ways it will
+eventually break.
+
 ## Data
 
 `data/cryonirsp_dataset_details.json` is generated, never hand-edited. Rebuild it from the upstream
