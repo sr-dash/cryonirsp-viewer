@@ -25,9 +25,9 @@ function renderTree(){
 
     Object.values(datasetDB).forEach(d=>{
 
-        const dateText = d.start_time
-            ? new Date(d.start_time).toISOString().slice(0,10)
-            : '';
+        // obs_date is a UTC string slice from the adapter — using a Date
+        // here re-introduced the timezone drift the adapter removed.
+        const dateText = d.obs_date || '';
 
         const inactiveIDs = Array.isArray(d.inactive_dataset_ids)
             ? d.inactive_dataset_ids.join(' ')
@@ -41,6 +41,9 @@ function renderTree(){
             inactiveIDs + ' ' +
             (d.waveband || '') + ' ' +
             (d.object || '') + ' ' +
+            (d.experiment_id || '') + ' ' +
+            (d.proposal_id || '') + ' ' +
+            (d.observing_mode || '') + ' ' +
             dateText
         ).toLowerCase();
 
@@ -76,7 +79,23 @@ function renderTree(){
         grouped[observingProgram][product].push(d);
     });
 
-    const programKeys = Object.keys(grouped).sort();
+    const sortMode = currentSortMode();
+
+    const programKeys = Object.keys(grouped)
+        .map(key => {
+
+            const times = Object.values(grouped[key])
+                .flat()
+                .map(d => d.start_date ? d.start_date.getTime() : 0);
+
+            return {
+                key,
+                earliest: times.length ? Math.min(...times) : 0,
+                latest:   times.length ? Math.max(...times) : 0
+            };
+        })
+        .sort((a, b) => programComparator(a, b, sortMode))
+        .map(entry => entry.key);
 
     programKeys.forEach(program=>{
 
@@ -94,7 +113,7 @@ function renderTree(){
                 <div>
 
                     <div class="collection-title mono">
-                        ${program}
+                        ${esc(program)}
                     </div>
 
                     <div style="
@@ -136,8 +155,15 @@ function renderTree(){
                 : 'block';
         };
 
-        const productKeys =
-            Object.keys(grouped[program]).sort();
+        const productKeys = sortMode === 'alphabetical'
+            ? Object.keys(grouped[program]).sort()
+            : Object.keys(grouped[program]).sort((pa, pb) => {
+
+                const ta = Math.max(...grouped[program][pa].map(d => d.start_date ? d.start_date.getTime() : 0));
+                const tb = Math.max(...grouped[program][pb].map(d => d.start_date ? d.start_date.getTime() : 0));
+
+                return sortMode === 'chronological_asc' ? ta - tb : tb - ta;
+            });
 
         productKeys.forEach(product=>{
 
@@ -156,7 +182,7 @@ function renderTree(){
                     <div>
 
                         <div class="product-title mono">
-                            ${product}
+                            ${esc(product)}
                         </div>
 
                         <div style="
@@ -164,7 +190,7 @@ function renderTree(){
                             color:var(--muted);
                             margin-top:4px;
                         ">
-                            ${datasets[0]?.waveband || 'Unknown'}
+                            ${esc(datasets[0]?.waveband || 'Unknown')}
                         </div>
 
                     </div>
@@ -198,20 +224,8 @@ function renderTree(){
                     : 'block';
             };
 
-            datasets.sort((a,b)=>{
-
-                const ta =
-                    a.start_time
-                    ? new Date(a.start_time).getTime()
-                    : 0;
-
-                const tb =
-                    b.start_time
-                    ? new Date(b.start_time).getTime()
-                    : 0;
-
-                return tb - ta;
-            });
+            datasets.sort((a,b)=>
+                sortComparator(a, b, sortMode));
 
             const renderCount =
                 Math.min(DATASET_RENDER_LIMIT,datasets.length);
@@ -228,23 +242,21 @@ function renderTree(){
                 item.innerHTML = `
 
                     <div class="dataset-id">
-                        ${d.dataset_id || 'UNKNOWN_DATASET'}
+                        ${esc(d.dataset_id || 'UNKNOWN_DATASET')}
                     </div>
 
                     <div class="dataset-meta">
 
                         <div>
-                            ${d.start_time
-                                ? d.start_time.slice(0,10)
-                                : 'Unknown'}
+                            ${esc(d.obs_date || 'Unknown')}
                         </div>
 
                         <div>
-                            ${d.waveband || 'N/A'}
+                            ${esc(d.waveband || 'N/A')}
                         </div>
 
                         <div>
-                            ${d.dataset_type || ''}
+                            ${esc(d.dataset_type || '')}
                         </div>
 
                     </div>

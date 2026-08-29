@@ -8,22 +8,12 @@ function renderDatasetDetails(){
 
     const d = activeDataset;
 
-    const contextImagePath = d.context_image
-        ? `cn_daily_context_figures/${d.context_image}`
-        : null;
+    // Media locations are resolved once, in js/adapt.js.
+    const contextImagePath = d.context_image_url;
 
-    const MEDIA_BASE =
-        'https://github.com/sr-dash/cryonirsp-media/releases/download/media-v1/';
+    const contextMoviePath = d.context_movie_url;
 
-    function mediaURL(filename) {
-        return filename ? MEDIA_BASE + filename : null;
-    }
-
-    const contextMoviePath =
-    mediaURL(d.context_movie);
-
-    const contextMovieThumbnail =
-        mediaURL(d.context_movie_thumbnail);
+    const contextMovieThumbnail = d.context_movie_poster_url;
 
     const panel = document.getElementById('detailsPanel');
 
@@ -43,13 +33,13 @@ function renderDatasetDetails(){
                     <div>
 
                         <div class="dataset-name">
-                            ${d.dataset_id || 'UNKNOWN_DATASET'}
+                            ${esc(d.dataset_id || 'UNKNOWN_DATASET')}
                         </div>
 
                         <div class="hero-sub">
 
-                            <div class="badge ${d.dataset_type}">
-                                ${d.dataset_type || 'unknown'}
+                            <div class="badge ${typeClass(d.dataset_type)}">
+                                ${esc(d.dataset_type || 'unknown')}
                             </div>
 
                             ${d.is_context_imager
@@ -76,7 +66,7 @@ function renderDatasetDetails(){
                         </div>
 
                         <div class="card-value mono">
-                            ${d.waveband || 'N/A'}
+                            ${esc(d.waveband || 'N/A')}
                         </div>
 
                     </div>
@@ -88,7 +78,7 @@ function renderDatasetDetails(){
                         </div>
 
                         <div class="card-value mono">
-                            ${d.line_wave || 'N/A'} nm
+                            ${esc(d.line_wave || 'N/A')} nm
                         </div>
 
                     </div>
@@ -100,7 +90,7 @@ function renderDatasetDetails(){
                         </div>
 
                         <div class="card-value mono">
-                            ${d.duration || 'N/A'}
+                            ${esc(d.duration || 'N/A')}
                         </div>
 
                     </div>
@@ -112,7 +102,7 @@ function renderDatasetDetails(){
                         </div>
 
                         <div class="card-value mono">
-                            ${d.dataset_shape_str || 'N/A'}
+                            ${esc(d.dataset_shape_str || 'N/A')}
                         </div>
 
                     </div>
@@ -147,29 +137,12 @@ function renderDatasetDetails(){
 
                             <div class="card-value mono">
 
-                                ${d.start_time ? (() => {
-
-                                    const t = new Date(d.start_time);
-
-                                    const doy = Math.floor(
-                                        (
-                                            t -
-                                            new Date(
-                                                Date.UTC(
-                                                    t.getUTCFullYear(),
-                                                    0,
-                                                    0
-                                                )
-                                            )
-                                        ) / 86400000
-                                    );
-
-                                    return `
-                                        ${t.getUTCFullYear()}-${String(doy).padStart(3,'0')}
-                                        ${t.toISOString().slice(11,19)} UTC
-                                    `;
-
-                                })() : 'N/A'}
+                                ${utcStamp(d.start_time)}
+                                ${d.start_time ? `<span style="
+                                    color:var(--muted);
+                                    font-size:11px;
+                                    margin-left:6px;
+                                ">DOY ${dayOfYear(d.start_time)}</span>` : ''}
 
                             </div>
 
@@ -183,29 +156,12 @@ function renderDatasetDetails(){
 
                             <div class="card-value mono">
 
-                                ${d.end_time ? (() => {
-
-                                    const t = new Date(d.end_time);
-
-                                    const doy = Math.floor(
-                                        (
-                                            t -
-                                            new Date(
-                                                Date.UTC(
-                                                    t.getUTCFullYear(),
-                                                    0,
-                                                    0
-                                                )
-                                            )
-                                        ) / 86400000
-                                    );
-
-                                    return `
-                                        ${t.getUTCFullYear()}-${String(doy).padStart(3,'0')}
-                                        ${t.toISOString().slice(11,19)} UTC
-                                    `;
-
-                                })() : 'N/A'}
+                                ${utcStamp(d.end_time)}
+                                ${d.end_time ? `<span style="
+                                    color:var(--muted);
+                                    font-size:11px;
+                                    margin-left:6px;
+                                ">DOY ${dayOfYear(d.end_time)}</span>` : ''}
 
                             </div>
 
@@ -218,7 +174,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${d.n_scanSteps || 'N/A'}
+                                ${esc(d.n_scanSteps ?? 'N/A')}
                             </div>
 
                         </div>
@@ -230,7 +186,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${d.n_measAtStep || 'N/A'}
+                                ${esc(d.n_measAtStep ?? 'N/A')}
                             </div>
 
                         </div>
@@ -258,7 +214,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${d.instrument_name || d.instrument || 'N/A'}
+                                ${esc(d.instrument_name || d.instrument || 'N/A')}
                             </div>
 
                         </div>
@@ -270,7 +226,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${d.observatory || 'N/A'}
+                                ${esc(d.observatory || 'N/A')}
                             </div>
 
                         </div>
@@ -282,7 +238,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${d.observer || 'N/A'}
+                                ${esc(d.observer || 'N/A')}
                             </div>
 
                         </div>
@@ -294,7 +250,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${d.object || 'N/A'}
+                                ${esc(d.object || 'N/A')}
                             </div>
 
                         </div>
@@ -306,11 +262,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${
-                                    d.stepWidth_arcsec != null
-                                    ? d.stepWidth_arcsec.toFixed(4)
-                                    : 'N/A'
-                                }
+                                ${fixed(d.stepWidth_arcsec, 4)}
                             </div>
 
                         </div>
@@ -322,11 +274,7 @@ function renderDatasetDetails(){
                             </div>
 
                             <div class="card-value mono">
-                                ${
-                                    d.slitSampling_arcsec != null
-                                    ? d.slitSampling_arcsec.toFixed(4)
-                                    : 'N/A'
-                                }
+                                ${fixed(d.slitSampling_arcsec, 4)}
                             </div>
 
                         </div>
@@ -334,6 +282,67 @@ function renderDatasetDetails(){
                     </div>
 
                 </div>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- OBSERVING PROGRAM -->
+            <!-- ================================================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    Observing Program
+                </div>
+
+                <div class="cards compact-cards">
+
+                    <div class="card">
+                        <div class="card-label">Experiment</div>
+                        <div class="card-value mono">${esc(d.experiment_id || 'N/A')}</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-label">Proposal</div>
+                        <div class="card-value mono">${esc(d.proposal_id || 'N/A')}</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-label">Observing Mode</div>
+                        <div class="card-value mono">${esc(d.observing_mode || 'N/A')}</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-label">Arm / Stokes</div>
+                        <div class="card-value mono">
+                            ${esc(d.arm || '?')} &middot; ${esc(d.stokes_parameters || '?')}
+                        </div>
+                    </div>
+
+                </div>
+
+                ${d.experiment_description ? `
+
+                    <div class="card" style="margin-top:16px;">
+
+                        <div class="card-label">
+                            Experiment Description
+                        </div>
+
+                        <div style="
+                            margin-top:10px;
+                            font-size:13px;
+                            line-height:1.6;
+                            color:var(--muted);
+                            max-height:190px;
+                            overflow-y:auto;
+                        ">
+                            ${esc(d.experiment_description)}
+                        </div>
+
+                    </div>
+
+                ` : ''}
 
             </div>
 
@@ -362,19 +371,19 @@ function renderDatasetDetails(){
                         <div class="context-media-content">
 
                             <a
-                                href="${contextImagePath}"
+                                href="${escURL(contextImagePath)}"
                                 target="_blank"
                             >
 
                                 <img
-                                    src="${contextImagePath}"
+                                    src="${escURL(contextImagePath)}"
                                     loading="lazy"
                                 >
 
                             </a>
 
                             <div class="context-caption">
-                                ${d.context_image || ''}
+                                ${esc(d.context_image || '')}
                             </div>
 
                         </div>
@@ -396,18 +405,18 @@ function renderDatasetDetails(){
                             <video
                                 controls
                                 preload="metadata"
-                                poster="${contextMovieThumbnail || ''}"
+                                poster="${escURL(contextMovieThumbnail)}"
                             >
 
                                 <source
-                                    src="${contextMoviePath}"
+                                    src="${escURL(contextMoviePath)}"
                                     type="video/mp4"
                                 >
 
                             </video>
 
                             <div class="context-caption">
-                                ${d.context_movie || ''}
+                                ${esc(d.context_movie || '')}
                             </div>
 
                         </div>
@@ -464,11 +473,7 @@ function renderDatasetDetails(){
 
                                 <div class="card-value mono">
 
-                                    ${
-                                        d.solar_radius_arcsec != null
-                                        ? d.solar_radius_arcsec.toFixed(2)
-                                        : 'N/A'
-                                    } arcsec
+                                    ${fixed(d.solar_radius_arcsec, 2, ' arcsec')}
 
                                 </div>
 
@@ -598,7 +603,7 @@ function renderDatasetDetails(){
                         </div>
 
                         <div class="card-value mono">
-                            ${d.collection_id || 'N/A'}
+                            ${esc(d.collection_id || 'N/A')}
                         </div>
 
                     </div>
@@ -614,7 +619,7 @@ function renderDatasetDetails(){
                             ${d.product_id
                                 ? `
                                     <a
-                                        href="https://dkist.data.nso.edu/product/${d.product_id}"
+                                        href="https://dkist.data.nso.edu/product/${encodeURIComponent(d.product_id)}"
                                         target="_blank"
                                         style="
                                             color:var(--accent2);
@@ -622,7 +627,7 @@ function renderDatasetDetails(){
                                             word-break:break-word;
                                         "
                                     >
-                                        ${d.product_id}
+                                        ${esc(d.product_id)}
                                     </a>
                                 `
                                 : 'N/A'}
@@ -661,8 +666,19 @@ function renderDatasetDetails(){
                                                 background:rgba(255,255,255,0.04);
                                                 border:1px solid rgba(255,255,255,0.05);
                                                 word-break:break-word;
+                                                display:flex;
+                                                justify-content:space-between;
+                                                gap:10px;
                                             ">
-                                                ${id}
+                                                <span>${esc(id)}</span>
+                                                <span style="
+                                                    font-size:10px;
+                                                    letter-spacing:0.6px;
+                                                    color:var(--muted);
+                                                    align-self:center;
+                                                ">
+                                                    ${esc((d.archived_status || {})[id] || '')}
+                                                </span>
                                             </div>
 
                                         `).join('')
@@ -675,7 +691,7 @@ function renderDatasetDetails(){
                                                 border:1px solid rgba(255,255,255,0.05);
                                                 word-break:break-word;
                                             ">
-                                                ${d.inactive_dataset_ids}
+                                                ${esc(d.inactive_dataset_ids)}
                                             </div>
                                         `
                                 )
@@ -695,15 +711,66 @@ function renderDatasetDetails(){
 
                         <div class="card-value mono">
 
-                            ${
-                                d.metadata_file
-                                ? d.metadata_file.split('/').pop()
-                                : 'N/A'
-                            }
+                            ${esc(d.metadata_file || 'N/A')}
 
                         </div>
 
                     </div>
+
+                    <div class="card">
+
+                        <div class="card-label">
+                            Calibration
+                        </div>
+
+                        <div class="card-value mono">
+                            ${esc(d.calibration_workflow_version || 'N/A')}
+                            ${d.dataset_status
+                                ? `<span style="color:var(--muted);font-size:11px;">
+                                       &middot; ${esc(d.dataset_status)}
+                                   </span>`
+                                : ''}
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-label">
+                            Size / Frames
+                        </div>
+
+                        <div class="card-value mono">
+                            ${fixed(d.dataset_size_gib, 2, ' GiB')}
+                            <span style="color:var(--muted);font-size:11px;">
+                                &middot; ${esc(d.number_of_frames ?? '?')} frames
+                            </span>
+                        </div>
+
+                    </div>
+
+                    ${d.preview_url ? `
+
+                    <div class="card">
+
+                        <div class="card-label">
+                            Data Center
+                        </div>
+
+                        <div class="card-value mono">
+                            <a
+                                href="${escURL(d.preview_url)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style="color:var(--accent2);text-decoration:none;"
+                            >
+                                Preview movie
+                            </a>
+                        </div>
+
+                    </div>
+
+                    ` : ''}
 
                 </div>
 
