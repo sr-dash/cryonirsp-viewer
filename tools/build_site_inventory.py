@@ -257,7 +257,7 @@ def build_record(product, available, stats):
 
     # The generator measures radial distance to the reference pointing, not to
     # the polygon centroid — the two differ by ~0.07 R-sun. Carry its value
-    # rather than letting a consumer re-derive a subtly different quantity.
+    # rather than letting the site re-derive a subtly different quantity.
     record["radial_distance"] = num(geometry.get("radial_distance_solar_radii"))
     record["reference_pointing_arcsec"] = clean(geometry.get("reference_pointing_arcsec"))
     record["position_angle_deg"] = position_angle(geometry.get("reference_pointing_arcsec"))
@@ -315,6 +315,10 @@ def build_record(product, available, stats):
     record["number_of_frames"] = num(active.get("number_of_frames"))
     record["embargoed"] = active.get("embargoed")
     record["downloadable"] = active.get("downloadable")
+
+    # The lift date is what the site actually needs: a static page cannot
+    # trust a stored boolean to stay true, but it can compare a date to now.
+    record["embargo_end_date"] = zulu(active.get("embargo_end_date"))
     record["calibration_workflow_version"] = active.get("calibration_workflow_version")
 
     return dataset_id, clean(record)

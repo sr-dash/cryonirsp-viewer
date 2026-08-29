@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
+  <!-- The archive is a single-page application: every dataset and every
+       filtered result set is a query string on this one URL, which is also
+       the canonical for all of them. Listing query URLs here would only
+       offer the crawler duplicates of this page. -->
   <url>
     <loc>https://sr-dash.github.io/cryonirsp-viewer/</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 

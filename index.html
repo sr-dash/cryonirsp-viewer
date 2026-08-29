@@ -1,267 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Solar Corona Infrared Spectropolarimetry Dataset Explorer</title>
+<title>Cryo-NIRSP Archive — DKIST solar corona infrared spectropolarimetry</title>
 
-    <meta name="description" content="Interactive browser for solar coronal infrared spectropolarimetric datasets with searchable metadata, context imagery, movies, and observational browsing tools.">
-    <meta name="keywords" content="solar physics, coronal spectroscopy, infrared spectropolarimetry, solar corona, heliophysics, coronal magnetic field, solar observations, astronomy datasets, coronal observations, DKIST, CryoNIRSP, NSO">
-    <meta name="author" content="Soumyaranjan Dash">
-    
-    <meta name="citation_title" content="Solar Corona Infrared Spectropolarimetry Dataset Explorer">
-    <meta name="citation_author" content="Soumyaranjan Dash">
-    <meta name="citation_public_url" content="https://sr-dash.github.io/cryonirsp-viewer/">
+<meta name="description" content="Search 1,002 DKIST Cryo-NIRSP Level-1 products of the solar corona in four infrared lines — Fe XIII 1074.7 and 1079.8 nm, He I 1083.0 nm and Si X 1430.0 nm. Filter by where the slit pointed, spectral line, target, polarisation and observing date, with calibration lineage and daily context imagery. 2022–2026.">
+<meta name="keywords" content="solar physics, solar corona, coronal spectroscopy, infrared spectropolarimetry, coronal magnetic field, forbidden coronal lines, Fe XIII 1074.7, Fe XIII 1079.8, He I 1083.0, Si X 1430.0, prominence, coronal hole, active region, spectropolarimetry, Stokes IQUV, DKIST, Cryo-NIRSP, CryoNIRSP, Daniel K. Inouye Solar Telescope, NSO, National Solar Observatory, Haleakala, heliophysics, astronomy datasets, Level-1 data, dataset archive">
+<meta name="author" content="Soumyaranjan Dash">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#1B242C" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ECF0F5" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
 
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Solar Corona Infrared Spectropolarimetry Dataset Explorer">
-    <meta property="og:description" content="Interactive browser for solar coronal infrared spectropolarimetric observations, metadata, imagery, and movies.">
-    <meta property="og:url" content="https://sr-dash.github.io/cryonirsp-viewer/">
-    <meta property="og:image" content="https://sr-dash.github.io/cryonirsp-viewer/assets/icons/og_preview.jpg">
+<!-- Google Scholar / citation -->
+<meta name="citation_title" content="Cryo-NIRSP Archive: a searchable inventory of DKIST coronal infrared spectropolarimetry">
+<meta name="citation_author" content="Dash, Soumyaranjan">
+<meta name="citation_public_url" content="https://sr-dash.github.io/cryonirsp-viewer/">
+<meta name="citation_publisher" content="National Solar Observatory">
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Solar Corona Infrared Spectropolarimetry Dataset Explorer">
-    <meta name="twitter:description" content="Interactive browser for solar coronal infrared spectropolarimetric datasets.">
-    <meta name="twitter:image" content="https://sr-dash.github.io/cryonirsp-viewer/assets/icons/og_preview.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cryo-NIRSP Archive">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Cryo-NIRSP Archive — every place the corona has been measured">
+<meta property="og:description" content="1,002 DKIST Level-1 products in four infrared lines, searchable by where the slit pointed, which line it sampled, and when. 88 observing nights, 2022–2026.">
+<meta property="og:url" content="https://sr-dash.github.io/cryonirsp-viewer/">
+<meta property="og:image" content="https://sr-dash.github.io/cryonirsp-viewer/assets/icons/og_preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cryo-NIRSP Archive — a gold radial histogram showing where around the solar limb the instrument has pointed.">
 
-    <link rel="canonical" href="https://sr-dash.github.io/cryonirsp-viewer/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cryo-NIRSP Archive — every place the corona has been measured">
+<meta name="twitter:description" content="1,002 DKIST Level-1 products in four infrared lines, searchable by pointing, line, target and date.">
+<meta name="twitter:image" content="https://sr-dash.github.io/cryonirsp-viewer/assets/icons/og_preview.jpg">
+<meta name="twitter:image:alt" content="Cryo-NIRSP Archive — pointing coverage around the solar limb.">
 
-    <script type="application/ld+json">
+<link rel="canonical" href="https://sr-dash.github.io/cryonirsp-viewer/">
+
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-        "@context": "https://schema.org",
-        "@type": "Dataset",
-        "name": "Solar Corona Infrared Spectropolarimetry Dataset Explorer",
-        "description": "Interactive browser for solar coronal infrared spectropolarimetric observations with metadata and contextual media.",
-        "url": "https://sr-dash.github.io/cryonirsp-viewer/",
-        "license": "https://creativecommons.org/licenses/by/4.0/",
-        "creator": {
-            "@type": "Person",
-            "name": "Soumyaranjan Dash"
-        },
-        "keywords": [
-            "solar corona",
-            "infrared spectroscopy",
-            "spectropolarimetry",
-            "solar observations",
-            "heliophysics",
-            "DKIST",
-            "CryoNIRSP",
-            "astronomy datasets",
-            "coronal magnetic field",
-            "solar physics",
-            "NSO"
-        ]
+      "@type": "DataCatalog",
+      "@id": "https://sr-dash.github.io/cryonirsp-viewer/#catalog",
+      "name": "Cryo-NIRSP Archive",
+      "alternateName": "DKIST Cryo-NIRSP Level-1 dataset inventory",
+      "description": "A searchable inventory of every DKIST Cryo-NIRSP Level-1 product: 1,002 products across 302 observing programs and 88 observing nights between October 2022 and August 2026, in four near-infrared lines. Each product is indexed by pointing (position angle and height above the limb), spectral line, target class, polarisation state, observing mode and calibration lineage.",
+      "url": "https://sr-dash.github.io/cryonirsp-viewer/",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "isAccessibleForFree": true,
+      "inLanguage": "en",
+      "keywords": ["solar corona", "infrared spectropolarimetry", "coronal magnetic field", "forbidden coronal lines", "Fe XIII", "He I", "Si X", "DKIST", "Cryo-NIRSP", "heliophysics", "solar physics"],
+      "measurementTechnique": "Near-infrared slit spectropolarimetry and context imaging",
+      "temporalCoverage": "2022-10-18/2026-08-13",
+      "spatialCoverage": {
+        "@type": "Place",
+        "name": "Solar corona, off-limb",
+        "description": "Predominantly 1.05 to 1.30 solar radii above the limb"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Soumyaranjan Dash",
+        "affiliation": { "@type": "Organization", "name": "National Solar Observatory" }
+      },
+      "publisher": { "@type": "Organization", "name": "National Solar Observatory", "url": "https://nso.edu/" },
+      "provider": { "@type": "Organization", "name": "DKIST Data Center", "url": "https://dkist.data.nso.edu/" },
+      "variableMeasured": [
+        { "@type": "PropertyValue", "name": "Spectral line", "description": "Fe XIII 1074.7 nm, Fe XIII 1079.8 nm, He I 1083.0 nm, Si X 1430.0 nm" },
+        { "@type": "PropertyValue", "name": "Position angle", "unitText": "degree", "description": "Where around the solar limb the slit pointed" },
+        { "@type": "PropertyValue", "name": "Radial distance", "unitText": "solar radii", "description": "Height of the field of view above disk centre" },
+        { "@type": "PropertyValue", "name": "Stokes parameters", "description": "Intensity only (I) or full polarisation (IQUV)" },
+        { "@type": "PropertyValue", "name": "Target class", "description": "Active corona, quiet corona, prominence or coronal hole" }
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://sr-dash.github.io/cryonirsp-viewer/#website",
+      "name": "Cryo-NIRSP Archive",
+      "url": "https://sr-dash.github.io/cryonirsp-viewer/",
+      "inLanguage": "en",
+      "about": { "@id": "https://sr-dash.github.io/cryonirsp-viewer/#catalog" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": { "@type": "EntryPoint", "urlTemplate": "https://sr-dash.github.io/cryonirsp-viewer/?q={search_term_string}" },
+        "query-input": "required name=search_term_string"
+      }
     }
-    </script>
+  ]
+}
+</script>
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MGSE00YM1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-6MGSE00YM1');
-    </script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6MGSE00YM1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6MGSE00YM1');
+</script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/landing.css">
-    <link rel="stylesheet" href="css/themes.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/sidebar.css">
-    <link rel="stylesheet" href="css/cards.css">
-    <link rel="stylesheet" href="css/details.css">
-    <link rel="stylesheet" href="css/context-media.css">
-    <link rel="stylesheet" href="css/solar.css">
-    <link rel="stylesheet" href="css/responsive.css">
+<script>
+  // Applied before first paint so an explicit choice never flashes the other theme.
+  try {
+    var t = localStorage.getItem('cryonirsp_theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/landing.css">
 </head>
 
-<body class="landing-mode">
+<body>
 
+<div class="app">
 
-    <div class="app">
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <div class="brand" data-nav="landing" role="button" tabindex="0">
+      <span class="name">Cryo&#8209;NIRSP Archive</span>
+      <span class="eyebrow">DKIST &middot; Haleakal&#257;</span>
+    </div>
+    <nav>
+      <button data-nav="landing">Overview</button>
+      <button data-nav="search">Search</button>
+      <button class="linkish" id="copyLink">copy link to this search</button>
+      <button class="themetoggle" id="themeToggle" aria-label="Switch theme">
+        <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+        </svg>
+        <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.4v2.2M12 19.4v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.4 12h2.2M19.4 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/>
+        </svg>
+      </button>
+    </nav>
+  </header>
 
-            <div
-                class="theme-switch"
-                id="themeToggle"
-                aria-label="Toggle theme"
-            >
+  <!-- ============ LANDING ============ -->
+  <main class="landing" id="landing" hidden></main>
 
-                <div class="theme-switch-track">
+  <!-- ============ SEARCH SHELL ============ -->
+  <div id="shell" style="display:contents;" hidden>
 
-                    <div class="theme-switch-thumb"></div>
-
-                    <div class="theme-icon sun">
-                        ☀
-                    </div>
-
-                    <div class="theme-icon moon">
-                        ☾
-                    </div>
-
-                </div>
-
-            </div>
-
-            <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle Menu">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-
-            <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-        <!-- ===================================== -->
-        <!-- SIDEBAR -->
-        <!-- ===================================== -->
-
-        <aside class="sidebar">
-
-            <div class="sidebar-header">
-
-                <div>
-                    <a href="#" id="homeLink" class="home-link">
-                        <div class="title">
-                            Cryo-NIRSP Archive
-                        </div>
-
-                        <div class="subtitle">
-                            Browser for CryoNIRSP metadata archives.
-                        </div>
-                    </a>
-                </div>
-
-            </div>
-
-            <div class="search-panel">
-
-                <input
-                    type="text"
-                    id="searchBox"
-                    placeholder="Search collections, products, dates, datasets..."
-                >
-
-                <select id="sortMode">
-
-                    <option value="chronological_desc">
-                        Newest First
-                    </option>
-
-                    <option value="chronological_asc">
-                        Oldest First
-                    </option>
-
-                    <option value="alphabetical">
-                        Alphabetical
-                    </option>
-
-                </select>
-
-                <select id="typeFilter">
-
-                    <option value="all">
-                        All datasets
-                    </option>
-
-                    <option value="polarimetric">
-                        Polarimetric
-                    </option>
-
-                    <option value="spectrometric">
-                        Spectroscopic
-                    </option>
-
-                    <option value="context_imager">
-                        Context Imager
-                    </option>
-
-                </select>
-
-                <!-- STATS -->
-                <div class="stats">
-
-                    <div
-                        class="stat clickable-stat"
-                        data-filter="all"
-                    >
-                        <div class="stat-label">DATASETS</div>
-                        <div class="stat-value" id="nDatasets">0</div>
-                    </div>
-
-                    <div
-                        class="stat clickable-stat"
-                        data-filter="polarimetric"
-                    >
-                        <div class="stat-label">POLARIMETRIC</div>
-                        <div class="stat-value" id="nPolarimetric">0</div>
-                    </div>
-
-                    <div
-                        class="stat clickable-stat"
-                        data-filter="spectrometric"
-                    >
-                        <div class="stat-label">SPECTROSCOPIC</div>
-                        <div class="stat-value" id="nSpectrometric">0</div>
-                    </div>
-
-                    <div
-                        class="stat clickable-stat"
-                        data-filter="context_imager"
-                    >
-                        <div class="stat-label">CONTEXT</div>
-                        <div class="stat-value" id="nContext">0</div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div
-                class="tree-container"
-                id="tree"
-            ></div>
-
-        </aside>
-
-        <!-- ===================================== -->
-        <!-- MAIN PANEL -->
-        <!-- ===================================== -->
-
-        <main
-            class="main"
-            id="detailsPanel"
-        >
-
-            <div class="placeholder">
-                Select a dataset from the archive tree.
-            </div>
-
-        </main>
-
+    <div class="querybar">
+      <div class="qfield" onclick="document.getElementById('qinput').focus()">
+        <span class="ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        </span>
+        <span id="tokens" style="display:flex; gap:8px; flex-wrap:wrap;"></span>
+        <input id="qinput" type="text" autocomplete="off" spellcheck="false"
+               placeholder="dataset id, programme, or a field prefix — line:hei_1083  target:prominence  after:2025-03  r&gt;1.1">
+      </div>
+      <div class="qhint">
+        <span class="keys">
+          <span>line:</span><span>target:</span><span>mode:</span><span>stokes:</span><span>after:</span><span>before:</span><span>pa:</span><span>r&gt;</span>
+        </span>
+        <span>a superseded dataset ID resolves to the product that replaced it</span>
+      </div>
     </div>
 
-    <!-- ===================================== -->
-    <!-- JAVASCRIPT -->
-    <!-- ===================================== -->
+    <div class="body">
+      <aside class="rail" id="rail"></aside>
 
-    <script src="js/state.js"></script>
-    <script src="js/adapt.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/theme.js"></script>
-    <script src="js/solar.js"></script>
-    <script src="js/solarArc.js"></script>
-    <script src="js/stats.js"></script>
-    <script src="js/landing.js"></script>
-    <script src="js/tree.js"></script>
-    <script src="js/details.js"></script>
-    <script src="js/events.js"></script>
-    <script src="js/loader.js"></script>
-    <script src="js/app.js"></script>
+      <main class="results" id="main">
+        <div class="results-head">
+          <div class="count" id="count"></div>
+          <div class="viewsel">
+            <span>view</span>
+            <button data-results="table" class="on">table</button>
+            <button data-results="grid">grid</button>
+          </div>
+        </div>
+        <div class="chips" id="activeChips"></div>
+        <div id="results"></div>
+      </main>
 
+      <aside class="aside" id="aside"></aside>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="drawer" id="drawer" role="dialog" aria-label="Dataset detail"></div>
+
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

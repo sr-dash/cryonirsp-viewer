@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap:
-https://sr-dash.github.io/cryonirsp-viewer/sitemap.xml
+# The inventory this site renders, should a crawler want the data directly.
+Allow: /data/
+
+Sitemap: https://sr-dash.github.io/cryonirsp-viewer/sitemap.xml
