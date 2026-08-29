@@ -501,3 +501,91 @@ a.tag:hover{ border-color:var(--accent); text-decoration:none; }
     margin-left:5px; font-size:9.5px; letter-spacing:0.06em;
     text-transform:uppercase; color:var(--dim);
 }
+
+/* =====================================================
+   CONTEXT MEDIA + LIGHTBOX
+
+   The media is served from a GitHub release with
+   Content-Disposition: attachment, so a plain link would
+   download rather than show it. Preview happens in the
+   lightbox; downloading is a labelled button there.
+===================================================== */
+
+.media-open{
+    display:block; width:100%; padding:0; border:none; background:none;
+    cursor:zoom-in; position:relative; line-height:0;
+}
+.media-open img{ width:100%; display:block; }
+.media-open .zoom,
+.media-open.corner{
+    position:absolute; right:8px; bottom:8px;
+    display:flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border-radius:2px;
+    background:rgba(10,16,20,.72); color:#fff;
+    border:1px solid rgba(255,255,255,.22);
+    opacity:0; transition:opacity var(--dur-fast) linear;
+}
+.media-open:hover .zoom,
+figure:hover .media-open.corner,
+.media-open:focus-visible .zoom,
+.media-open.corner:focus-visible{ opacity:1; }
+
+/* The movie stays playable in place; the corner button enlarges it. */
+.vwrap{ position:relative; line-height:0; }
+.vwrap video{ width:100%; display:block; }
+.media-open.corner{ width:30px; height:30px; cursor:zoom-in; padding:0; }
+
+.media figcaption .hint{ color:var(--faint); margin-left:6px; }
+
+/* ---------- the lightbox itself ---------- */
+
+.lightbox{ position:fixed; inset:0; z-index:60; display:none; }
+.lightbox.open{ display:block; }
+
+.lb-backdrop{
+    position:absolute; inset:0; background:rgba(6,10,13,.82);
+    backdrop-filter:blur(2px);
+    animation:fadeIn var(--dur) var(--ease);
+}
+.lb-frame{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; padding:28px;
+    pointer-events:none;                 /* clicks fall through to the backdrop */
+}
+.lb-stage, .lb-bar{ pointer-events:auto; }
+
+.lb-stage{
+    display:flex; align-items:center; justify-content:center;
+    max-width:min(1500px, 94vw); max-height:84vh;
+    animation:lbIn var(--dur-slow) var(--ease-out);
+}
+.lb-stage img, .lb-stage video{
+    max-width:min(1500px, 94vw); max-height:84vh;
+    width:auto; height:auto; display:block;
+    background:#000; border:1px solid var(--edge);
+}
+
+@keyframes lbIn{ from{ opacity:0; transform:scale(.975); } to{ opacity:1; transform:none; } }
+
+.lb-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    width:min(1500px, 94vw);
+    animation:fadeIn var(--dur-slow) var(--ease) backwards; animation-delay:60ms;
+}
+.lb-caption{ font-family:var(--f-mono); font-size:11.5px; color:#C7D2DA; }
+.lb-actions{ display:flex; gap:8px; }
+.lb-btn{
+    font:inherit; font-size:12px; cursor:pointer;
+    background:rgba(255,255,255,.07); color:#EAF1F5;
+    border:1px solid rgba(255,255,255,.22); border-radius:2px;
+    padding:6px 12px; text-decoration:none;
+}
+.lb-btn:hover{ background:rgba(255,255,255,.15); border-color:var(--accent); }
+
+body.lb-locked{ overflow:hidden; }
+
+@media (max-width:640px){
+    .lb-frame{ padding:14px; }
+    .lb-bar{ flex-direction:column; align-items:flex-start; gap:8px; }
+}

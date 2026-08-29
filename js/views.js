@@ -27,6 +27,11 @@ export const escURL = (v) => {
 
 const lineColor = (k) => LINE_COLOR[k] || 'var(--dim)';
 
+const ZOOM_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+     stroke-width="2" stroke-linecap="round" aria-hidden="true">
+  <circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.6-4.6M10.5 7.8v5.4M7.8 10.5h5.4"/>
+</svg>`;
+
 // A small lock beside the identifier, carrying the lift date in its tooltip.
 // Density matters more than a whole column here: 157 of 1,002 are embargoed
 // and the date only matters once you care about one of them.
@@ -297,12 +302,26 @@ export function renderDetail(el, r) {
                 <h4>Context media</h4>
                 <div class="media">
                     ${r.image ? `<figure>
-                        <a href="${esc(r.image)}" target="_blank" rel="noopener noreferrer"><img loading="lazy" src="${esc(r.image)}" alt="Daily context image"></a>
-                        <figcaption>daily context · ${esc(r.date)}</figcaption>
+                        <button class="media-open" data-media="image"
+                                data-src="${escURL(r.image)}"
+                                data-caption="Daily context · ${esc(r.date)}"
+                                aria-label="Enlarge the daily context image">
+                            <img loading="lazy" src="${escURL(r.image)}" alt="Daily context image for ${esc(r.date)}">
+                            <span class="zoom">${ZOOM_ICON}</span>
+                        </button>
+                        <figcaption>daily context &middot; ${esc(r.date)} <span class="hint">click to enlarge</span></figcaption>
                     </figure>` : ''}
                     ${r.movie ? `<figure>
-                        <video controls preload="none" poster="${esc(r.poster || '')}"><source src="${esc(r.movie)}" type="video/mp4"></video>
-                        <figcaption>daily movie · ${esc(r.date)}</figcaption>
+                        <div class="vwrap">
+                            <video controls playsinline preload="none" poster="${escURL(r.poster || '')}">
+                                <source src="${escURL(r.movie)}" type="video/mp4">
+                            </video>
+                            <button class="media-open corner" data-media="video"
+                                    data-src="${escURL(r.movie)}"
+                                    data-caption="Daily movie · ${esc(r.date)}"
+                                    aria-label="Enlarge the daily movie">${ZOOM_ICON}</button>
+                        </div>
+                        <figcaption>daily movie &middot; ${esc(r.date)} <span class="hint">play here, or enlarge</span></figcaption>
                     </figure>` : ''}
                 </div>
             </div>` : ''}

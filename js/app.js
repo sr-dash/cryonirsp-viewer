@@ -10,6 +10,7 @@ import { renderAside, wireDisk, R_BINS } from './aside.js';
 import { renderLanding } from './landing.js';
 import { initTheme } from './theme.js';
 import { animateCounts, tweenNumber, recallCount, rememberCount } from './motion.js';
+import { initLightbox, isOpen as lightboxOpen } from './lightbox.js';
 
 const PAGE_SIZE = 60;
 
@@ -45,6 +46,7 @@ const $ = (s) => document.querySelector(s);
     }
 
     initTheme();
+    initLightbox();
     readURL();
     wireChrome();
     render();
@@ -328,7 +330,7 @@ function wireChrome() {
             update(() => { state.view = 'search'; });
             $('#qinput').focus();
         }
-        if (e.key === 'Escape' && state.active) update(() => { state.active = null; }, { keepLimit: true, animate: false });
+        if (e.key === 'Escape' && state.active && !lightboxOpen()) update(() => { state.active = null; }, { keepLimit: true, animate: false });
     });
 
     window.addEventListener('popstate', () => { readURL(); render(); });

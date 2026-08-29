@@ -97,6 +97,18 @@ themes clears WCAG AA against its own ground. Dark is the default. The toggle in
 no choice the OS setting decides and the page follows it live. The chosen theme is applied before
 first paint, so there is no flash of the wrong one.
 
+### Context media
+
+The media is served from a GitHub release, which sends
+`Content-Disposition: attachment` — so a plain link to it makes the browser download the file rather
+than show it. Clicking a thumbnail now opens a lightbox instead, and downloading is a labelled
+button there rather than a surprise.
+
+The movie plays in place; a corner control enlarges it. Enlarging hands the current position over to
+the larger player and closing hands it back, so enlarging never restarts what you were watching.
+Native full screen is one more step from the lightbox. Escape closes the lightbox without closing
+the record underneath it.
+
 ### Motion
 
 Native CSS and one 72-line helper — no animation library, so the site still has no
