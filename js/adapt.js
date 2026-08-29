@@ -338,6 +338,11 @@ function adaptRecord(raw, key){
         slitSampling_arcsec: num(raw.slitSampling_arcsec),
         solar_radius_arcsec: num(raw.solar_radius_arcsec),
         slit_angle_deg:      num(raw.slit_angle_deg),
+
+        // Measured to the reference pointing by the generator. Deriving these
+        // from the footprint centroid instead gives a value ~0.07 R higher.
+        radial_distance:     num(raw.radial_distance),
+        position_angle_deg:  num(raw.position_angle_deg),
         crval1:              num(raw.crval1),
         crval2:              num(raw.crval2),
 

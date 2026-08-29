@@ -152,6 +152,16 @@ def duration_seconds(structure, start, end):
     return None
 
 
+def position_angle(reference):
+    """Position angle of the reference pointing, degrees CCW from solar west."""
+    if not isinstance(reference, list) or len(reference) < 2:
+        return None
+    x, y = num(reference[0]), num(reference[1])
+    if x is None or y is None:
+        return None
+    return math.degrees(math.atan2(y, x)) % 360.0
+
+
 def media_for(date_compact, available):
     """Only reference media that actually exists locally."""
     image = IMAGE_PATTERN.format(date=date_compact)
@@ -245,6 +255,14 @@ def build_record(product, available, stats):
     record["slitSampling_arcsec"] = num(geometry.get("slit_sampling_arcsec"))
     record["spatial_bounds_arcsec"] = clean(geometry.get("spatial_bounds_arcsec"))
 
+    # The generator measures radial distance to the reference pointing, not to
+    # the polygon centroid — the two differ by ~0.07 R-sun. Carry its value
+    # rather than letting a consumer re-derive a subtly different quantity.
+    record["radial_distance"] = num(geometry.get("radial_distance_solar_radii"))
+    record["reference_pointing_arcsec"] = clean(geometry.get("reference_pointing_arcsec"))
+    record["position_angle_deg"] = position_angle(geometry.get("reference_pointing_arcsec"))
+    record["slit_angle_deg"] = num(geometry.get("slit_position_angle_deg"))
+
     # ---- provenance (tier B) ----
     record["instrument"] = product.get("instrument")
     record["instrument_name"] = product.get("instrument")
@@ -261,7 +279,9 @@ def build_record(product, available, stats):
     )
 
     # ---- shape (tier B) ----
-    record["dataset_shape"] = dataset_shape(structure)
+    shape = dataset_shape(structure)
+    record["dataset_shape"] = shape
+    record["dataset_shape_str"] = " \u00d7 ".join(str(v) for v in shape) if shape else None
     record["n_scanSteps"] = num(axes.get("n_scan_steps"))
     record["n_measAtStep"] = num(axes.get("n_measurements"))
     record["n_stokes"] = num(axes.get("n_stokes"))

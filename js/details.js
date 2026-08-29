@@ -463,7 +463,31 @@ function renderDatasetDetails(){
 
                     <div>
 
-                        <div class="cards">
+                        <div class="cards compact-cards">
+
+                            <div class="card">
+
+                                <div class="card-label">
+                                    Radial Distance
+                                </div>
+
+                                <div class="card-value mono">
+                                    ${fixed(d.radial_distance, 3, ' R\u2609')}
+                                </div>
+
+                            </div>
+
+                            <div class="card">
+
+                                <div class="card-label">
+                                    Position Angle
+                                </div>
+
+                                <div class="card-value mono">
+                                    ${fixed(d.position_angle_deg, 1, '\u00b0')}
+                                </div>
+
+                            </div>
 
                             <div class="card">
 
