@@ -180,11 +180,17 @@ export function renderLanding(el, records, meta) {
       </div>
 
       <div class="foot">
-        <p>
-          Context imagery and daily movies courtesy of Tom Schad (NSO). Level-1 data are distributed
-          by the <a href="https://dkist.data.nso.edu/" target="_blank" rel="noopener noreferrer">DKIST Data Center</a>;
-          this archive indexes and cross-references them. Every superseded dataset ID still resolves.
-        </p>
+        <div>
+          <p class="byline">
+            Compiled and developed by <strong>Soumyaranjan Dash</strong>,
+            National Solar Observatory.
+          </p>
+          <p>
+            Context imagery and daily movies courtesy of Tom Schad (NSO). Level-1 data are distributed
+            by the <a href="https://dkist.data.nso.edu/" target="_blank" rel="noopener noreferrer">DKIST Data Center</a>;
+            this archive indexes and cross-references them. Every superseded dataset ID still resolves.
+          </p>
+        </div>
         <div class="stamp">
           <div>Inventory ${meta.generatedAt ? esc(meta.generatedAt.slice(0, 10)) : '—'}</div>
           <div>Next automatic refresh ${esc(refresh.date)} <span class="soon">${esc(refresh.when)}</span></div>

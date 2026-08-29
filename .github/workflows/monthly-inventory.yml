@@ -40,7 +40,7 @@ env:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 330          # under the 360 hard limit, so we fail tidily
+    timeout-minutes: 330          # the enrich budget keeps runs well inside this
 
     steps:
       - uses: actions/checkout@v4
@@ -81,10 +81,61 @@ jobs:
       - name: Fetch metadata for new datasets
         run: python3 tools/inventory/cryonirsp-inventory fetch
 
+      # Enrich in chunks against a wall clock, saving state after each one.
+      #
+      # A shared runner reads ASDFs about five times slower than a laptop —
+      # measured at roughly 3 products/min against 15 locally — so a full
+      # rebuild of 1,002 does not fit in one job. Chunking means no single
+      # run can exceed its budget, and saving state after every chunk means
+      # a timeout costs one chunk rather than the whole run. Successive runs
+      # pick up exactly where the last stopped, because enrich skips whatever
+      # already carries a structure block.
+      #
+      # A partially enriched archive is a supported state, not a broken one:
+      # geometry is tier A-prime in the contract precisely because it arrives
+      # later than the rest of the record.
       - name: Enrich new datasets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENRICH_BUDGET_MIN: 210
+          CHUNK: 120
         run: |
-          python3 tools/inventory/cryonirsp-inventory enrich --jobs 4 \
-            ${{ inputs.rebuild && '--overwrite' || '' }}
+          remaining() {
+            python3 - <<'PY'
+          import json, os
+          try:
+              d = json.load(open('cryonirsp_inventory.json'))
+          except Exception:
+              print(0); raise SystemExit
+          print(sum(1 for p in d['products'].values() if not p.get('structure')))
+          PY
+          }
+
+          deadline=$(( $(date +%s) + ENRICH_BUDGET_MIN * 60 ))
+          ${{ inputs.rebuild && 'python3 tools/inventory/cryonirsp-inventory enrich --jobs 2 --limit 1 --overwrite || true' || 'true' }}
+
+          while :; do
+            left=$(remaining)
+            echo "::notice::$left products still to enrich"
+            [ "$left" -eq 0 ] && { echo "fully enriched"; break; }
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo "::warning::Enrichment budget reached with $left products still to do. State is saved; the next run continues from here."
+              break
+            fi
+            python3 tools/inventory/cryonirsp-inventory enrich --jobs 2 --limit "$CHUNK"
+
+            # Save after every chunk. A job that dies later must not undo work
+            # that is already done.
+            gzip -kf cryonirsp_inventory.json
+            gh release view "$STATE_TAG" >/dev/null 2>&1 \
+              || gh release create "$STATE_TAG" --title "Inventory state" \
+                   --notes "Generator state carried between monthly runs. Not part of the site."
+            gh release upload "$STATE_TAG" cryonirsp_inventory.json.gz --clobber
+            rm -f cryonirsp_inventory.json.gz
+            echo "checkpoint saved"
+          done
+
+          echo "ENRICH_REMAINING=$(remaining)" >> "$GITHUB_ENV"
 
       # Observing-day tags come from a third-party summary page. When that
       # page changes shape the tags do not error, they quietly become zero —
@@ -211,11 +262,13 @@ jobs:
             echo 'title=Monthly inventory refresh' >> "$GITHUB_OUTPUT"
             echo 'verdict=clean' >> "$GITHUB_OUTPUT"
             echo 'note=Counts and vocabularies look like a month of growth. Worth a glance at the numbers before merging.' >> "$GITHUB_OUTPUT"
+          fi
+          if [ "${ENRICH_REMAINING:-0}" -gt 0 ]; then
+            echo "partial=$ENRICH_REMAINING products are not yet enriched, so they carry no pointing geometry. This is a supported state and the next run continues from here." >> "$GITHUB_OUTPUT"
           else
             echo 'title=Monthly inventory refresh — REVIEW: delta check flagged regressions' >> "$GITHUB_OUTPUT"
             echo 'verdict=flagged regressions' >> "$GITHUB_OUTPUT"
             echo 'note=Something regressed enough that this should not be merged without a look — the archive shrank, a vocabulary emptied, coverage collapsed, or dataset ids that used to resolve no longer would.' >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Open a pull request
         uses: peter-evans/create-pull-request@v6
@@ -232,5 +285,7 @@ jobs:
             **Delta check: ${{ steps.pr.outputs.verdict }}**
 
             ${{ steps.pr.outputs.note }}
+
+            ${{ steps.pr.outputs.partial }}
 
             Full validation and delta reports are in the [job summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).

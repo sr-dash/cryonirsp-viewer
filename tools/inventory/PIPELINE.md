@@ -24,18 +24,26 @@ restored:
 | | state restored, nothing new | state restored, a month of data | no state at all |
 |---|---|---|---|
 | search | ~1 min | ~1 min | ~1 min |
-| fetch | **0 files** | ~25 MB, <1 min | 1,002 files, 1 GB, ~6 min |
-| enrich | nothing to do | ~6 min | ~65 min |
+| fetch | **0 files** | ~25 MB, <1 min | 1,002 files, 1 GB, ~8 min |
+| enrich | nothing to do | ~15 min | does not fit in one run |
 | tags, build, validate | <1 min | <1 min | <1 min |
-| **total** | **~3 min** | **~10 min** | **~75 min** |
+| **total** | **~3 min** | **~20 min** | **several runs** |
 
-The last column only happens if the `inventory-state` release is missing —
-the very first run, or if someone deletes it — or when a `rebuild` dispatch
-asks for it deliberately. It is a one-off, not a monthly cost.
+**Enrichment on a shared runner is about five times slower than on a
+laptop** — measured at roughly 3 products per minute against 15 locally, and
+the difference is not just the worker count. A full 1,002-product rebuild is
+therefore around five hours of enrichment, which does not fit in a six hour
+job with any margin worth having.
 
-The job limit is 6 hours. Even the full rebuild has four times the headroom it
-needs, which is the margin that makes this safe to leave alone: the worst
-case still finishes.
+So enrichment runs in chunks against a wall clock, and saves state after every
+chunk. No single run can overrun its budget, and a run that dies costs one
+chunk rather than everything before it. The next run resumes exactly where the
+last stopped, because enrich skips whatever already carries a structure block.
+
+A partially enriched archive is a supported state, not a broken one. Those
+products appear in the site with everything except pointing geometry, which is
+why geometry is tier A-prime in the contract rather than tier A. A build from
+a half-enriched inventory validates with zero errors.
 
 ## State
 
