@@ -306,16 +306,24 @@ jobs:
         id: pr
         run: |
           if [ "${{ steps.delta.outcome }}" = "success" ]; then
-            echo 'title=Monthly inventory refresh' >> "$GITHUB_OUTPUT"
-            echo 'verdict=clean' >> "$GITHUB_OUTPUT"
-            echo 'note=Counts and vocabularies look like a month of growth. Worth a glance at the numbers before merging.' >> "$GITHUB_OUTPUT"
-          fi
-          if [ "${ENRICH_REMAINING:-0}" -gt 0 ]; then
-            echo "partial=$ENRICH_REMAINING products are not yet enriched, so they carry no pointing geometry. This is a supported state and the next run continues from here." >> "$GITHUB_OUTPUT"
+            {
+              echo 'title=Monthly inventory refresh'
+              echo 'verdict=clean'
+              echo 'note=Counts and vocabularies look like a month of growth. Worth a glance at the numbers before merging.'
+            } >> "$GITHUB_OUTPUT"
           else
-            echo 'title=Monthly inventory refresh — REVIEW: delta check flagged regressions' >> "$GITHUB_OUTPUT"
-            echo 'verdict=flagged regressions' >> "$GITHUB_OUTPUT"
-            echo 'note=Something regressed enough that this should not be merged without a look — the archive shrank, a vocabulary emptied, coverage collapsed, or dataset ids that used to resolve no longer would.' >> "$GITHUB_OUTPUT"
+            {
+              echo 'title=Monthly inventory refresh — REVIEW: delta check flagged regressions'
+              echo 'verdict=flagged regressions'
+              echo 'note=Something regressed enough that this should not be merged without a look — the archive shrank, a vocabulary emptied, coverage collapsed, or dataset ids that used to resolve no longer would.'
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ "${ENRICH_REMAINING:-0}" -gt 0 ]; then
+            echo "partial=$ENRICH_REMAINING products are not yet enriched, so they carry no pointing geometry. That is a supported state, and the next run continues from here." >> "$GITHUB_OUTPUT"
+          else
+            echo 'partial=' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Open a pull request
         uses: peter-evans/create-pull-request@v6
