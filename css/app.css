@@ -439,3 +439,58 @@
     animation:riseIn var(--dur) var(--ease) backwards;
     animation-delay:calc(80ms + min(var(--i,0), 6) * var(--stagger));
 }
+
+/* =====================================================
+   OBSERVING-DAY TAGS
+===================================================== */
+
+/* Category rows head the tag list and are selectable themselves. */
+.facet.cat{
+    margin-top:8px; border:none; border-bottom:1px solid var(--line);
+    border-radius:0; padding:5px 2px 5px 0;
+    font-size:10.5px; font-weight:600; letter-spacing:0.09em; text-transform:uppercase;
+    color:var(--dim);
+}
+.facet.cat:first-child{ margin-top:0; }
+.facet.cat[aria-pressed="true"]{ background:none; color:var(--accent-ink); border-bottom-color:var(--accent); }
+.facet.sub{ margin-left:10px; width:calc(100% - 10px); }
+
+/* Tag chips in the detail panel. */
+.tagset{ display:flex; flex-wrap:wrap; gap:6px; }
+.tag{
+    display:inline-flex; align-items:center; gap:7px;
+    border:1px solid var(--line); border-radius:2px;
+    padding:5px 9px; font-size:12.5px; color:var(--text);
+    background:var(--panel);
+}
+a.tag:hover{ border-color:var(--accent); text-decoration:none; }
+.tag .cat{
+    font-size:9.5px; font-weight:600; letter-spacing:0.09em; text-transform:uppercase;
+    color:var(--dim);
+}
+.tag svg{ color:var(--dim); flex:none; }
+
+/* Issues are caveats, not decoration: they get the warning treatment and
+   sit above the pointing and media sections in the drawer. */
+.issue{
+    border:1px solid var(--line); border-left:3px solid var(--warn);
+    border-radius:2px; padding:10px 13px; margin-bottom:6px;
+}
+.issue.data{ border-left-color:var(--fexiii_1074); }
+.issue .k{
+    font-size:9.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--warn); margin-bottom:3px;
+}
+.issue.data .k{ color:var(--fexiii_1074); }
+.issue .v{ font-size:12.5px; color:var(--text); line-height:1.5; }
+
+.pubs{ display:flex; flex-direction:column; gap:5px; }
+.pub{
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; padding:7px 11px;
+    border:1px solid var(--line); border-radius:2px;
+}
+.pub:hover{ border-color:var(--accent); }
+
+/* Row marker for a product whose day carries a data issue. */
+.row .flag{ color:var(--fexiii_1074); flex:none; }

@@ -38,6 +38,14 @@ export const TARGET_LABEL = {
     unknown:      'Unclassified'
 };
 
+// Observing-day tag categories, in the order the facet rail shows them.
+export const TAG_CATEGORY_LABEL = {
+    solar_feature: 'Solar feature',
+    coordinated_observation: 'Coordinated observation',
+    eclipse: 'Eclipse',
+    reference: 'Reference'
+};
+
 export const MODE_LABEL = {
     spectroscopy: 'Spectroscopy',
     spectropolarimetry: 'Spectropolarimetry',
@@ -186,6 +194,17 @@ export async function loadArchive() {
             pa: g.pa,
             rbin: radialBin(g.r),
 
+            // Observing-day annotations. These describe the DAY, so every
+            // product observed that day carries the same set.
+            observingDate: d.observing_date_hst || null,
+            tags: Array.isArray(d.tags) ? d.tags : [],
+            tagNames: Array.isArray(d.tag_names) ? d.tag_names : [],
+            tagCategories: Array.isArray(d.tag_categories) ? d.tag_categories : [],
+            publications: Array.isArray(d.publications) ? d.publications : [],
+            knownIssues: Array.isArray(d.known_issues) ? d.known_issues : [],
+            dataIssues: Array.isArray(d.data_issues) ? d.data_issues : [],
+            summarySource: d.summary_source || null,
+
             superseded,
             supersededStatus: d.archived_status || {},
             status: d.dataset_status,
@@ -214,6 +233,8 @@ export async function loadArchive() {
         // lapsed     — the inventory still says embargoed but the date passed
         // released   — was embargoed, now open
         // open       — never embargoed
+        rec.hasIssues = rec.knownIssues.length > 0 || rec.dataIssues.length > 0;
+        rec.hasPublication = rec.publications.length > 0;
         rec.liftsInDays = lifts;
         rec.embargoed = lifts !== null ? lifts > 0 : rec.embargoFlag;
         rec.embargoState = rec.embargoed
@@ -225,7 +246,11 @@ export async function loadArchive() {
             rec.id, rec.product, rec.program, rec.experiment, rec.proposal,
             rec.lineLabel, rec.target, rec.mode, rec.date,
             superseded.join(' '), rec.description,
-            rec.embargoed ? 'embargoed' : 'public available'
+            rec.embargoed ? 'embargoed' : 'public available',
+            rec.tagNames.join(' '),
+            rec.tags.map((t) => t.label).join(' '),
+            rec.publications.map((p) => p.label).join(' '),
+            rec.knownIssues.join(' '), rec.dataIssues.join(' ')
         ].join(' ').toLowerCase();
 
         records.push(rec);

@@ -13,7 +13,11 @@ export const GROUPS = [
     { id: 'stokes', name: 'Polarisation',    field: 'stokes' },
     { id: 'rbin',   name: 'Radial position', field: 'rbin' },
     { id: 'use',    name: 'Ready for',       field: null },
-    { id: 'avail',  name: 'Availability',    field: null }
+    { id: 'avail',  name: 'Availability',    field: null },
+    // Tags describe the observing day. A product matches if it carries the
+    // tag; within the group the values OR, as everywhere else.
+    { id: 'tag',    name: 'Observing day',   field: null },
+    { id: 'note',   name: 'Annotations',     field: null }
 ];
 
 export function emptyQuery() {
@@ -42,6 +46,19 @@ function matchesUse(rec, values) {
         (v === 'ctx' && rec.contextImager));
 }
 
+function matchesTag(rec, values) {
+    return values.some((v) =>
+        rec.tagNames.includes(v) || rec.tagCategories.includes(v));
+}
+
+function matchesNote(rec, values) {
+    return values.some((v) =>
+        (v === 'publication' && rec.hasPublication) ||
+        (v === 'known_issue' && rec.knownIssues.length > 0) ||
+        (v === 'data_issue' && rec.dataIssues.length > 0) ||
+        (v === 'untagged' && rec.tagNames.length === 0));
+}
+
 function matchesAvail(rec, values) {
     return values.some((v) =>
         (v === 'public' && !rec.embargoed) ||
@@ -65,6 +82,8 @@ export function matches(rec, q, skip) {
 
         if (g.id === 'use') { if (!matchesUse(rec, sel)) return false; continue; }
         if (g.id === 'avail') { if (!matchesAvail(rec, sel)) return false; continue; }
+        if (g.id === 'tag') { if (!matchesTag(rec, sel)) return false; continue; }
+        if (g.id === 'note') { if (!matchesNote(rec, sel)) return false; continue; }
         if (!sel.includes(rec[g.field])) return false;
     }
 
@@ -106,6 +125,14 @@ export function facetCounts(records, q, groupId, values) {
         if (groupId === 'use') {
             if (rec.fittable && 'fit' in counts) counts.fit++;
             if (rec.contextImager && 'ctx' in counts) counts.ctx++;
+        } else if (groupId === 'tag') {
+            rec.tagNames.forEach((t) => { if (t in counts) counts[t]++; });
+            rec.tagCategories.forEach((c) => { if (c in counts) counts[c]++; });
+        } else if (groupId === 'note') {
+            if (rec.hasPublication && 'publication' in counts) counts.publication++;
+            if (rec.knownIssues.length && 'known_issue' in counts) counts.known_issue++;
+            if (rec.dataIssues.length && 'data_issue' in counts) counts.data_issue++;
+            if (!rec.tagNames.length && 'untagged' in counts) counts.untagged++;
         } else if (groupId === 'avail') {
             if (rec.embargoed) {
                 if ('embargoed' in counts) counts.embargoed++;
@@ -178,7 +205,8 @@ export function fromParams(params) {
 
 const FIELD_TO_GROUP = {
     line: 'line', target: 'target', mode: 'mode',
-    stokes: 'stokes', pos: 'rbin', available: 'avail', avail: 'avail'
+    stokes: 'stokes', pos: 'rbin', available: 'avail', avail: 'avail',
+    tag: 'tag', category: 'tag', has: 'note'
 };
 
 export function parseInput(text, q) {

@@ -313,13 +313,45 @@ def build_record(product, available, stats):
     record["quality_report_filename"] = active.get("quality_report_filename")
     record["dataset_size_gib"] = num(active.get("dataset_size_gib"))
     record["number_of_frames"] = num(active.get("number_of_frames"))
-    record["embargoed"] = active.get("embargoed")
-    record["downloadable"] = active.get("downloadable")
-
-    # The lift date is what the site actually needs: a static page cannot
-    # trust a stored boolean to stay true, but it can compare a date to now.
-    record["embargo_end_date"] = zulu(active.get("embargo_end_date"))
+    # The generator now publishes an access block; prefer it over the
+    # per-dataset flags it was derived from. The lift date is what the site
+    # actually needs: a static page cannot trust a stored boolean to stay
+    # true, but it can compare a date to now.
+    access = product.get("access") or {}
+    record["access_status"] = access.get("status")
+    record["embargoed"] = first(access.get("embargoed"), active.get("embargoed"))
+    record["downloadable"] = first(access.get("frames_downloadable"), active.get("downloadable"))
+    record["metadata_available"] = access.get("metadata_available")
+    record["embargo_end_date"] = zulu(
+        first(access.get("embargo_end_date"), active.get("embargo_end_date")))
     record["calibration_workflow_version"] = active.get("calibration_workflow_version")
+
+    # ---- observing-day annotations (inventory 2026-08-29) ----
+    # These come from the daily summary page and describe the OBSERVING DAY,
+    # so every product taken that day carries them. Kept as-is rather than
+    # flattened: the category groups the facet rail, and the url makes a tag
+    # a link out to the coordinating mission or the summary itself.
+    day = product.get("observing_day") or {}
+    tags = [t for t in (day.get("tags") or []) if isinstance(t, dict) and t.get("tag")]
+
+    record["observing_date_hst"] = day.get("observing_date_hst")
+    record["tags"] = [
+        {
+            "tag": t.get("tag"),
+            "label": t.get("label"),
+            "category": t.get("category"),
+            "url": t.get("url"),
+        }
+        for t in tags
+    ]
+    record["tag_names"] = sorted({t["tag"] for t in record["tags"]})
+    record["tag_categories"] = sorted({t["category"] for t in record["tags"] if t.get("category")})
+    record["publications"] = [
+        p for p in (day.get("publications") or []) if isinstance(p, dict) and p.get("label")
+    ]
+    record["known_issues"] = [i for i in (day.get("known_issues") or []) if isinstance(i, str)]
+    record["data_issues"] = [i for i in (day.get("data_issues") or []) if isinstance(i, str)]
+    record["summary_source"] = day.get("source")
 
     return dataset_id, clean(record)
 
@@ -458,6 +490,17 @@ def main():
           f"{stats['unenriched']} awaiting enrichment")
     print(f"media      {stats['with_media']} with context media, "
           f"{stats['without_media']} without")
+
+    tagged = sum(1 for r in datasets.values() if r.get("tag_names"))
+    vocab = sorted({t for r in datasets.values() for t in (r.get("tag_names") or [])})
+    print(f"tags       {tagged} products carry observing-day tags, "
+          f"{len(vocab)} distinct tags")
+    for key, label in (("publications", "publications"),
+                       ("known_issues", "known issues"),
+                       ("data_issues", "data issues")):
+        n = sum(1 for r in datasets.values() if r.get(key))
+        if n:
+            print(f"           {n} with {label}")
     for key in ("skipped_no_active", "skipped_no_start", "duplicate_dataset_id"):
         if stats[key]:
             print(f"SKIPPED    {stats[key]} ({key})")

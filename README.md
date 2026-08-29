@@ -21,6 +21,8 @@ Useful entry points:
 | `/?target=prominence&line=fexiii_1074` | A pre-filtered search — every query is a link |
 | `/?pa=150-210` | Everything observed on the east limb |
 | `/?avail=soon` | The 77 products whose embargo lifts within 90 days |
+| `/?tag=coronal_rain` | Everything observed on a day showing coronal rain |
+| `/?note=data_issue` | The 8 products with a known problem in the frames |
 | `/?dataset=PQLYUM` | A **superseded** dataset ID, resolving to the product that replaced it |
 
 ## What changed, and why
@@ -38,7 +40,7 @@ every record ships a footprint. Drag an arc across the disk to filter by positio
 height histogram to filter by radial distance. The landing page's rose is the same control,
 read-only.
 
-**Structured query tokens.** `line:` `target:` `mode:` `stokes:` `available:` `after:` `before:` `pa:` `r>` `r<`,
+**Structured query tokens.** `line:` `target:` `mode:` `stokes:` `available:` `tag:` `category:` `has:` `after:` `before:` `pa:` `r>` `r<`,
 with a bare-word fallback that searches experiment abstracts — 1,002 records carry one and nothing
 searched them before.
 
@@ -51,6 +53,17 @@ trusting the stored boolean — this is a static site whose inventory can be mon
 would keep claiming an embargo that had already expired. When the 45 products dated 2026-11-25 come
 free, the page shows them as available with no rebuild. A record whose flag and date disagree is
 reported as lapsed rather than silently believed.
+
+**Observing-day tags.** The daily summary page annotates observing days, and the inventory now
+carries those through: 13 tags in four categories (solar feature, coordinated observation, eclipse,
+reference) on 371 products, plus publications, known issues and data issues. They describe the
+**day**, so every product taken that day carries the same set — the detail panel says so rather than
+implying the note is about that one dataset.
+
+The facet rail groups the tags under their categories, and a category is selectable in its own right
+(picking *Eclipse* takes both eclipse tags). `tag:`, `category:` and `has:` join the token syntax.
+A day carrying a **data issue** is marked in the results list; known issues are not, because there
+are 94 of them and they are operational notes rather than warnings about the frames.
 
 **Calibration lineage is visible.** The `Cal` column counts superseded dataset IDs; the detail panel
 lists them with status. Any of the 1,692 old IDs resolves to its current product.

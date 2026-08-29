@@ -7,18 +7,41 @@
    records.
 ===================================================== */
 
-import { LINE_COLOR, LINE_SHORT, TARGET_LABEL, MODE_LABEL,
+import { LINE_COLOR, LINE_SHORT, TARGET_LABEL, MODE_LABEL, TAG_CATEGORY_LABEL,
          fmtDuration, fmtSize, utcStamp, fmtDate } from './data.js';
 import { GROUPS, facetCounts } from './query.js';
 
 const E = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = (v) => v === null || v === undefined ? '' : String(v).replace(/[&<>"']/g, (c) => E[c]);
 
+// A URL bound for href. The tag and publication links come from the daily
+// summary page, so they are third-party data: anything that is not plain
+// http(s) or a same-origin relative path is dropped rather than rendered,
+// which keeps a javascript: URL from ever reaching an attribute.
+export const escURL = (v) => {
+    if (v === null || v === undefined) return '';
+    const u = String(v).trim();
+    if (u.startsWith('//')) return '';           // protocol-relative: off-site
+    return (/^https?:\/\//i.test(u) || /^[\w./?=&#%-]+$/.test(u)) ? esc(u) : '';
+};
+
 const lineColor = (k) => LINE_COLOR[k] || 'var(--dim)';
 
 // A small lock beside the identifier, carrying the lift date in its tooltip.
 // Density matters more than a whole column here: 157 of 1,002 are embargoed
 // and the date only matters once you care about one of them.
+// A data issue is a caveat on the frames themselves, so it earns a mark in
+// the list. Known issues do not — there are 94 of them and they are
+// operational notes, not warnings about the data.
+function issueGlyph(r) {
+    if (!r.dataIssues.length) return '';
+    const title = r.dataIssues.join(' · ');
+    return `<svg class="flag" viewBox="0 0 24 24" width="11" height="11" fill="none"
+                 stroke="currentColor" stroke-width="2.2" aria-label="Data issue"><title>${esc(title)}</title>
+              <path d="M12 8v5M12 17h.01M10.3 3.9 2.4 18a1.6 1.6 0 0 0 1.4 2.4h16.4a1.6 1.6 0 0 0 1.4-2.4L13.7 3.9a1.6 1.6 0 0 0-2.8 0z"/>
+            </svg>`;
+}
+
 function lockGlyph(r) {
     if (!r.embargoed) return '';
     const when = fmtDate(r.embargoEnd);
@@ -44,8 +67,27 @@ export const FACETS = {
     stokes: ['I', 'IQUV'],
     rbin:   ['near', 'far', 'limb', 'disk'],
     use:    ['fit', 'ctx'],
-    avail:  ['public', 'embargoed', 'soon']
+    avail:  ['public', 'embargoed', 'soon'],
+
+    // Ordered by category so the rail reads as four ideas, not thirteen
+    // unrelated switches. Categories are selectable in their own right.
+    tag: [
+        'solar_feature',
+        'coronal_cavity', 'cme', 'coronal_waves', 'coronal_rain',
+        'polar_crown_cavity', 'post_flare_loops',
+        'coordinated_observation',
+        'psp_encounter', 'solar_orbiter', 'mlso_kcor_ucomp', 'vla_radio',
+        'eclipse',
+        'total_solar_eclipse', 'day_after_eclipse',
+        'reference',
+        'presentation'
+    ],
+
+    note: ['publication', 'known_issue', 'data_issue', 'untagged']
 };
+
+// Which of the tag values are category headings rather than tags.
+export const TAG_CATEGORIES = new Set(Object.keys(TAG_CATEGORY_LABEL));
 
 export const LABELS = {
     line: LINE_SHORT,
@@ -59,7 +101,30 @@ export const LABELS = {
         disk: 'On disk <0.95'
     },
     use:   { fit: 'Line fitting (cn-specfit)', ctx: 'Context imagery' },
-    avail: { public: 'Available now', embargoed: 'Embargoed', soon: 'Embargo lifts within 90 days' }
+    avail: { public: 'Available now', embargoed: 'Embargoed', soon: 'Embargo lifts within 90 days' },
+
+    tag: Object.assign({
+        coronal_cavity: 'Coronal cavity',
+        cme: 'CME',
+        coronal_waves: 'Coronal waves',
+        coronal_rain: 'Coronal rain',
+        polar_crown_cavity: 'Polar crown cavity',
+        post_flare_loops: 'Post-flare loops',
+        psp_encounter: 'Parker Solar Probe encounter',
+        solar_orbiter: 'Solar Orbiter quadrature',
+        mlso_kcor_ucomp: 'MLSO K-Cor / UCoMP',
+        vla_radio: 'VLA radio',
+        total_solar_eclipse: 'Total solar eclipse',
+        day_after_eclipse: 'Day after eclipse',
+        presentation: 'Presentation or poster'
+    }, TAG_CATEGORY_LABEL),
+
+    note: {
+        publication: 'Has a publication',
+        known_issue: 'Has a known issue',
+        data_issue: 'Has a data issue',
+        untagged: 'No observing-day tags'
+    }
 };
 
 // -----------------------------------------------------
@@ -75,9 +140,24 @@ export function renderRail(el, records, q) {
         const items = values.map((v, vi) => {
             const on = sel.includes(v);
             const n = counts[v] || 0;
+
+            // A category heading inside the tag group: still selectable — it
+            // matches every tag beneath it — but set apart so thirteen tags
+            // read as four ideas.
+            if (g.id === 'tag' && TAG_CATEGORIES.has(v)) {
+                return `
+                <button class="facet cat${n === 0 && !on ? ' zero' : ''}" style="--i:${vi}"
+                        aria-pressed="${on}"
+                        data-group="${esc(g.id)}" data-value="${esc(v)}"
+                        ${n === 0 && !on ? 'disabled' : ''}>
+                    <span class="lbl">${esc(LABELS[g.id][v] || v)}</span>
+                    <span class="n" data-count-key="${esc(g.id)}:${esc(v)}" data-count="${n}">${n.toLocaleString()}</span>
+                </button>`;
+            }
+
             const dot = g.id === 'line' ? lineColor(v) : (on ? 'var(--accent)' : 'var(--faint)');
             return `
-                <button class="facet${n === 0 && !on ? ' zero' : ''}" style="--i:${vi}"
+                <button class="facet${n === 0 && !on ? ' zero' : ''}${g.id === 'tag' ? ' sub' : ''}" style="--i:${vi}"
                         aria-pressed="${on}"
                         data-group="${esc(g.id)}" data-value="${esc(v)}"
                         ${n === 0 && !on ? 'disabled' : ''}>
@@ -89,7 +169,7 @@ export function renderRail(el, records, q) {
 
         return `
             <div class="fgroup">
-                <h3>${esc(g.name)}<span>${values.length}</span></h3>
+                <h3>${esc(g.name)}<span>${g.id === 'tag' ? '13 tags' : values.length}</span></h3>
                 <div class="fitems">${items}</div>
             </div>`;
     }).join('');
@@ -153,7 +233,7 @@ export function renderResults(el, rows, opts) {
     const body = rows.slice(0, limit).map((r, i) => `
         <button class="row${r.id === activeId ? ' on' : ''}" style="--i:${i}" data-id="${esc(r.id)}">
             <span class="stripe" style="background:${esc(lineColor(r.line))}"></span>
-            <span class="id">${esc(r.id)}${lockGlyph(r)}</span>
+            <span class="id">${esc(r.id)}${lockGlyph(r)}${issueGlyph(r)}</span>
             <span>
                 <span class="prod">${esc(r.product)}</span>
                 <span class="tgt">${esc(TARGET_LABEL[r.target] || r.target)} <em>· ${esc(MODE_LABEL[r.mode] || r.mode || '')}</em></span>
@@ -226,6 +306,8 @@ export function renderDetail(el, r) {
                 ${availabilityBlock(r)}
             </div>
 
+            ${observingDayBlock(r)}
+
             <div class="dsec" style="--i:3">
                 <h4>Pointing</h4>
                 <div class="kv">
@@ -276,6 +358,54 @@ export function renderDetail(el, r) {
             </div>
         </div>`;
 }
+
+// Everything the daily summary says about the day this was observed.
+// Issues first: they are a caveat on the data, not a footnote.
+function observingDayBlock(r) {
+    const hasAnything = r.tags.length || r.publications.length
+        || r.knownIssues.length || r.dataIssues.length;
+    if (!hasAnything) return '';
+
+    const issues = [
+        ...r.dataIssues.map((i) => ({ cls: 'data', k: 'Data issue', v: i })),
+        ...r.knownIssues.map((i) => ({ cls: '', k: 'Known issue', v: i }))
+    ].map((i) => `
+        <div class="issue ${i.cls}">
+            <div class="k">${esc(i.k)}</div>
+            <div class="v">${esc(i.v)}</div>
+        </div>`).join('');
+
+    const tags = r.tags.map((t) => {
+        const inner = `
+            <span class="cat">${esc(TAG_CATEGORY_LABEL[t.category] || t.category || '')}</span>
+            <span>${esc(t.label || t.tag)}</span>
+            ${t.url ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>` : ''}`;
+        return t.url
+            ? `<a class="tag" href="${escURL(t.url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+            : `<span class="tag">${inner}</span>`;
+    }).join('');
+
+    const pubs = r.publications.map((p) => p.url
+        ? `<a class="pub" href="${escURL(p.url)}" target="_blank" rel="noopener noreferrer">
+             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></svg>
+             ${esc(p.label)}
+           </a>`
+        : `<span class="pub">${esc(p.label)}</span>`).join('');
+
+    return `
+        <div class="dsec" style="--i:2">
+            <h4>Observing day${r.observingDate ? ` — ${esc(r.observingDate)} HST` : ''}</h4>
+            ${issues}
+            ${tags ? `<div class="tagset"${issues ? ' style="margin-top:10px"' : ''}>${tags}</div>` : ''}
+            ${pubs ? `<div class="pubs" style="margin-top:10px">${pubs}</div>` : ''}
+            <div style="margin-top:10px; font-size:11.5px; color:var(--dim); line-height:1.5;">
+                These notes describe the whole observing day, so every product
+                taken on ${esc(r.observingDate || 'this date')} carries them.${r.summarySource
+                    ? ` <a href="${escURL(r.summarySource)}" target="_blank" rel="noopener noreferrer">Daily summary</a>.` : ''}
+            </div>
+        </div>`;
+}
+
 
 function availabilityBlock(r) {
     if (r.embargoState === 'embargoed') {
