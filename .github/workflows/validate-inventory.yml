@@ -1,0 +1,128 @@
+name: Validate inventory
+
+# The inventory file is the site's only data source and nothing else checks it.
+# This is the gate: a regenerated inventory that would render the archive
+# incorrectly fails here rather than on the live site.
+#
+# Contract: data/SCHEMA.md
+
+on:
+  push:
+    paths:
+      - 'data/**'
+      - 'js/adapt.js'
+      - 'tools/validate_inventory.py'
+      - '.github/workflows/validate-inventory.yml'
+  pull_request:
+    paths:
+      - 'data/**'
+      - 'js/adapt.js'
+      - 'tools/validate_inventory.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Both figures and movies are served from one GitHub release, so one
+      # manifest covers both. Without it a new observing day can reference a
+      # file the release does not contain and the page shows a broken image
+      # or a dead player. Best-effort: an unreachable API skips the check
+      # rather than failing the build on an outage.
+      - name: Fetch media release manifest
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          TAG=$(grep -oE "RELEASE_TAG = '[^']+'" js/adapt.js | cut -d"'" -f2)
+          echo "adapt.js pins release tag: $TAG"
+          gh release view "$TAG" \
+            --repo sr-dash/cryonirsp-media \
+            --json assets --jq '.assets[].name' > media-assets.txt
+          echo "Release $TAG lists $(wc -l < media-assets.txt) assets."
+
+          # The validator checks images against a directory, so materialise
+          # the manifest as empty files instead of downloading 2.5 GB.
+          mkdir -p .manifest-media
+          while read -r f; do : > ".manifest-media/$f"; done < media-assets.txt
+
+      # Catches drift between the generator's output and what is committed:
+      # if rebuilding produces a different file, the published copy is stale.
+      - name: Check published inventory is current
+        if: hashFiles('../CryoNIRSP-Datasets/cryonirsp_inventory.json') != ''
+        run: |
+          python3 tools/build_site_inventory.py \
+            ../CryoNIRSP-Datasets/cryonirsp_inventory.json \
+            -o /tmp/rebuilt.json
+          if ! diff -q /tmp/rebuilt.json data/cryonirsp_dataset_details.json >/dev/null; then
+            echo "::error::data/cryonirsp_dataset_details.json is stale — re-run tools/build_site_inventory.py"
+            exit 1
+          fi
+
+      # JSON.parse is stricter than Python's json module: the generator emits
+      # bare NaN literals, and one surviving into the published file would
+      # leave the site with an empty archive.
+      - name: Reject JSON that the browser cannot parse
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('data/cryonirsp_dataset_details.json','utf8'))" \
+            && echo "JSON.parse accepts the published inventory."
+
+      - name: Validate inventory against the contract
+        run: |
+          ARGS="--summary-file summary.md"
+
+          if [ -s media-assets.txt ]; then
+            ARGS="$ARGS --image-dir .manifest-media --movie-manifest media-assets.txt"
+          else
+            echo "::warning::Media release unavailable — skipping the media checks."
+          fi
+
+          python3 tools/validate_inventory.py \
+            data/cryonirsp_dataset_details.json $ARGS
+
+      - name: Publish summary
+        if: always()
+        run: |
+          if [ -f summary.md ]; then
+            cat summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # A truncated inventory is the failure most likely to slip through:
+      # it is valid JSON, satisfies every field rule, and silently drops
+      # most of the archive. Compare against the base branch on PRs.
+      - name: Check for unexpected record loss
+        if: github.event_name == 'pull_request'
+        run: |
+          NEW=$(python3 -c "import json;d=json.load(open('data/cryonirsp_dataset_details.json'));print(len(d.get('datasets',d)))")
+
+          git fetch --depth=1 origin "${{ github.base_ref }}"
+
+          if git cat-file -e "origin/${{ github.base_ref }}:data/cryonirsp_dataset_details.json" 2>/dev/null; then
+            git show "origin/${{ github.base_ref }}:data/cryonirsp_dataset_details.json" > base.json
+            OLD=$(python3 -c "import json;d=json.load(open('base.json'));print(len(d.get('datasets',d)))")
+          else
+            OLD=0
+          fi
+
+          echo "base: $OLD records -> head: $NEW records"
+          echo "- records: **$OLD → $NEW**" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$OLD" -gt 0 ] && [ "$NEW" -lt "$OLD" ]; then
+            echo "::error::Record count dropped from $OLD to $NEW. If this is intentional, say so in the PR description and re-run."
+            exit 1
+          fi

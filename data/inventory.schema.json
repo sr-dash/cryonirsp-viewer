@@ -1,0 +1,561 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sr-dash.github.io/cryonirsp-viewer/data/inventory.schema.json",
+    "title": "Cryo-NIRSP dataset inventory",
+    "description": "Contract between the inventory generator and the cryonirsp-viewer site. See data/SCHEMA.md for the prose version and the rationale behind each rule.",
+    "oneOf": [
+        {
+            "$ref": "#/$defs/wrappedInventory"
+        },
+        {
+            "$ref": "#/$defs/datasetMap"
+        }
+    ],
+    "$defs": {
+        "wrappedInventory": {
+            "type": "object",
+            "required": [
+                "datasets"
+            ],
+            "properties": {
+                "schema_version": {
+                    "type": "string",
+                    "pattern": "^[0-9]+\\.[0-9]+$",
+                    "description": "MAJOR.MINOR of this contract. Bump MAJOR when a tier-A field changes."
+                },
+                "generated_at": {
+                    "$ref": "#/$defs/timestamp",
+                    "description": "When the inventory was built. Drives the site's 'Last updated' line."
+                },
+                "source": {
+                    "type": "string",
+                    "description": "Free text describing where the inventory came from (host, script, run id)."
+                },
+                "datasets": {
+                    "$ref": "#/$defs/datasetMap"
+                },
+                "dataset_aliases": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Superseded dataset id -> current dataset id. Must not contain any key that is also a live dataset id."
+                }
+            }
+        },
+        "datasetMap": {
+            "type": "object",
+            "minProperties": 1,
+            "description": "Keyed by dataset_id. The key and the record's dataset_id must agree.",
+            "propertyNames": {
+                "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "additionalProperties": {
+                "$ref": "#/$defs/dataset"
+            }
+        },
+        "timestamp": {
+            "type": "string",
+            "description": "RFC 3339 with an explicit UTC designator, e.g. 2022-10-19T19:22:18.319500Z. A naive timestamp (no T, no offset) is accepted for backwards compatibility but is interpreted as UTC and warned about.",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[T ][0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:?[0-9]{2})?$"
+        },
+        "finiteNumber": {
+            "type": "number",
+            "description": "Must be a JSON number, not a numeric string. The site calls .toFixed() on several of these."
+        },
+        "dataset": {
+            "type": "object",
+            "required": [
+                "dataset_id",
+                "product_id",
+                "observingProgramExecutionId",
+                "dataset_type",
+                "is_context_imager",
+                "start_time",
+                "end_time",
+                "waveband",
+                "metadata_file"
+            ],
+            "properties": {
+                "dataset_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "TIER A. Unique. Must equal the map key."
+                },
+                "product_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "TIER A. Second tree level and the dkist.data.nso.edu/product/<id> deep link."
+                },
+                "observingProgramExecutionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "TIER A. Top tree level."
+                },
+                "dataset_type": {
+                    "type": "string",
+                    "enum": [
+                        "polarimetric",
+                        "spectrometric"
+                    ],
+                    "description": "TIER A. Drives the counters, the type filter, and the badge CSS class. Adding a value requires a site change."
+                },
+                "is_context_imager": {
+                    "type": "boolean",
+                    "description": "TIER A. Must be a real boolean, not \"true\" or 1."
+                },
+                "start_time": {
+                    "$ref": "#/$defs/timestamp",
+                    "description": "TIER A. Sort key, tree date, search text."
+                },
+                "end_time": {
+                    "$ref": "#/$defs/timestamp",
+                    "description": "TIER A."
+                },
+                "waveband": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "TIER A. Human label, e.g. 'Fe XIII (1074.7 nm)'. Prefer supplying waveband_key alongside it."
+                },
+                "waveband_key": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9_]+$",
+                    "description": "OPTIONAL, recommended. Stable machine key for the spectral line, e.g. fe13_1074. Lets the site filter on waveband without parsing the label."
+                },
+                "metadata_file": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "TIER A. Only the basename is displayed; the site calls .split('/').pop() on it."
+                },
+                "solar_radius_arcsec": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/finiteNumber"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "TIER A-prime. Required only once the ASDF enrichment pass has run."
+                },
+                "stepWidth_arcsec": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/finiteNumber"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "TIER A-prime. Absent for products that do not raster."
+                },
+                "slitSampling_arcsec": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/finiteNumber"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "TIER A-prime. Absent for every CI-arm product \u2014 no slit."
+                },
+                "spatial_bounds_arcsec": {
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": {
+                                "type": "array",
+                                "minItems": 3,
+                                "items": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "TIER A-prime. [xs, ys] \u2014 two parallel arrays of equal length forming a closed ring in arcsec from disk centre. Null until enrichment supplies it; malformed is an error, absent is a warning."
+                },
+                "collection_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "instrument": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Fallback for instrument_name."
+                },
+                "instrument_name": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "observatory": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "observer": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "telescope": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER C. Not displayed."
+                },
+                "object": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Target class, e.g. activecorona."
+                },
+                "line_wave": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "TIER B. Central wavelength in nm."
+                },
+                "n_scanSteps": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "n_measAtStep": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "n_stokes": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "description": "TIER C, but keep \u2014 feeds dataset_shape."
+                },
+                "n_alongSlit": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "description": "TIER C, but keep."
+                },
+                "n_wavelength": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "description": "TIER C, but keep."
+                },
+                "duration_seconds": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "TIER B, preferred over duration. The site derives the '12m 6s' string from this."
+                },
+                "duration": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER C once duration_seconds is present. Pre-formatted display string; the site now derives its own and uses this only as a fallback."
+                },
+                "dataset_shape": {
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "items": {
+                        "type": "integer"
+                    },
+                    "description": "TIER B, preferred over dataset_shape_str."
+                },
+                "dataset_shape_str": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER C once dataset_shape is present. Pre-formatted display string, fallback only."
+                },
+                "inactive_dataset_ids": {
+                    "type": [
+                        "array",
+                        "string",
+                        "null"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "TIER B. Superseded dataset IDs. A bare string or the literal 'nan' is tolerated but discouraged."
+                },
+                "context_image": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Bare filename, resolved against the context-image base."
+                },
+                "context_movie": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Bare filename, resolved against the media release base."
+                },
+                "context_movie_thumbnail": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Video poster, same base as context_movie."
+                },
+                "date_avg": {
+                    "$ref": "#/$defs/timestamp",
+                    "description": "TIER C."
+                },
+                "crval1": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "TIER C."
+                },
+                "crval2": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "TIER C."
+                },
+                "slit_angle_deg": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "TIER C."
+                },
+                "scan_center_arcsec": {
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "items": {
+                        "type": "number"
+                    },
+                    "description": "TIER C."
+                },
+                "bbox_arcsec": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "description": "TIER C."
+                },
+                "bbox_solar_radii": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "description": "TIER C."
+                },
+                "dataset_path": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "DISCOURAGED. Absolute path on the generating host; publishes internal layout and inflates the payload."
+                },
+                "spatial_npz": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "DISCOURAGED. Absolute path."
+                },
+                "context_image_path": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "DISCOURAGED. Absolute path."
+                },
+                "context_movie_path": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "DISCOURAGED. Absolute path."
+                },
+                "context_movie_thumbnail_path": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "DISCOURAGED. Absolute path."
+                },
+                "experiment_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. DKIST experiment id, e.g. eid_1_122. Searchable."
+                },
+                "proposal_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. DKIST proposal id. Searchable."
+                },
+                "experiment_description": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Operator-authored FREE TEXT \u2014 must be rendered through esc(). See SCHEMA.md section 6."
+                },
+                "observing_mode": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "spectroscopy",
+                        "spectropolarimetry",
+                        "context_imaging",
+                        "context_imaging_polarimetry",
+                        null
+                    ],
+                    "description": "TIER B. The generator's four-way mode; dataset_type is derived from full_stokes."
+                },
+                "arm": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "SP",
+                        "CI",
+                        null
+                    ],
+                    "description": "TIER B. Instrument arm."
+                },
+                "stokes_parameters": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. \"I\" or \"IQUV\"."
+                },
+                "analysis_class": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "is_fittable": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "dataset_status": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Status of the active dataset, e.g. ACTIVE."
+                },
+                "archived_status": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "additionalProperties": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "description": "TIER B. Superseded dataset id -> status (DEPRECATED / REMOVED)."
+                },
+                "preview_url": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B. Data Center preview movie link."
+                },
+                "quality_report_filename": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER C."
+                },
+                "dataset_size_gib": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "number_of_frames": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "embargoed": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "downloadable": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                },
+                "calibration_workflow_version": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "TIER B."
+                }
+            }
+        }
+    }
+}
