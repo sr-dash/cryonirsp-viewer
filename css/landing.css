@@ -145,3 +145,5 @@
 
 .btn{ transition:background var(--dur-fast) linear, border-color var(--dur-fast) linear, transform var(--dur-fast) var(--ease); }
 .btn:active{ transform:translateY(1px); }
+
+.foot .stamp .soon{ color:var(--accent-ink); }

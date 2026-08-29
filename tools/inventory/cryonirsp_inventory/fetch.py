@@ -99,6 +99,17 @@ def fetch_metadata(
             summary["skipped"] += 1
             continue
 
+        # Nothing downstream opens the ASDF of a product that has already
+        # been enriched: enrich skips it on the structure block, and the
+        # metadata block was recorded when it was first fetched. On a
+        # monthly schedule the runner starts with no local tree, so without
+        # this the pipeline would re-download the whole archive every month
+        # to read none of it.
+        if not overwrite and product.get("structure") and product.get("metadata"):
+            summary["skipped"] += 1
+            summary["already_enriched"] = summary.get("already_enriched", 0) + 1
+            continue
+
         directory = dataset_directory(root, product, group_by=group_by)
         existing = _existing_asdf(directory)
 
@@ -111,7 +122,11 @@ def fetch_metadata(
 
         pending.append(product)
 
-    log.info("%d datasets to download, %d already present", len(pending), summary["skipped"])
+    log.info(
+        "%d datasets to download, %d already present (%d of them already enriched, "
+        "so their metadata files are never needed again)",
+        len(pending), summary["skipped"], summary.get("already_enriched", 0),
+    )
 
     for start in range(0, len(pending), batch_size):
         batch = pending[start : start + batch_size]

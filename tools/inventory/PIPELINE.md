@@ -8,21 +8,32 @@ each month and opens a pull request. It never pushes to `main`.
 The pipeline is incremental, and that is a property of the code rather than a
 convention:
 
-- `fetch.py:105` skips ASDFs already on disk
+- `fetch.py` skips a product that already carries **both** a `structure` and a
+  `metadata` block — nothing downstream will ever open its ASDF again
+- `fetch.py` also skips any ASDF already on disk
 - `cli.py:161` skips products that already carry a `structure` block
 
-Both are keyed on `cryonirsp_inventory.json`, which the workflow restores at
-the start of a run. So a typical month fetches and enriches only what is new.
+The first of those is what makes a monthly run cheap. A runner starts with no
+`Level-1/` tree, so without it every run would re-download the entire 1 GB
+archive in order to read none of it. With the state restored, a run with
+nothing new to do transfers **zero** metadata files.
 
-| | cold rebuild | typical month |
-|---|---|---|
-| search | ~1 min | ~1 min |
-| fetch | 997 files, 1 GB, ~6 min | ~25 MB, <1 min |
-| enrich | ~65 min (0.26 products/s) | ~6 min |
-| tags, build, validate | <1 min | <1 min |
-| **total** | **~75 min** | **~10 min** |
+Three cases, and the difference between them is only whether the state was
+restored:
 
-The job limit is 6 hours. Even a cold rebuild has four times the headroom it
+| | state restored, nothing new | state restored, a month of data | no state at all |
+|---|---|---|---|
+| search | ~1 min | ~1 min | ~1 min |
+| fetch | **0 files** | ~25 MB, <1 min | 1,002 files, 1 GB, ~6 min |
+| enrich | nothing to do | ~6 min | ~65 min |
+| tags, build, validate | <1 min | <1 min | <1 min |
+| **total** | **~3 min** | **~10 min** | **~75 min** |
+
+The last column only happens if the `inventory-state` release is missing —
+the very first run, or if someone deletes it — or when a `rebuild` dispatch
+asks for it deliberately. It is a one-off, not a monthly cost.
+
+The job limit is 6 hours. Even the full rebuild has four times the headroom it
 needs, which is the margin that makes this safe to leave alone: the worst
 case still finishes.
 

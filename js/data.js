@@ -234,6 +234,10 @@ export async function loadArchive() {
             embargoFlag: d.embargoed === true,
             downloadable: d.downloadable !== false,
 
+            // present | pending (observed after the last published imagery)
+            // | absent (a date that has none and is not going to get any)
+            mediaStatus: d.media_status || (d.context_image ? 'present' : 'absent'),
+
             image: d.context_image ? MEDIA_BASE + d.context_image : null,
             movie: d.context_movie ? MEDIA_BASE + d.context_movie : null,
             poster: d.context_movie_thumbnail ? MEDIA_BASE + d.context_movie_thumbnail : null
@@ -291,7 +295,8 @@ export async function loadArchive() {
         meta: {
             schemaVersion: payload.schema_version || null,
             generatedAt: payload.generated_at || null,
-            source: payload.source || null
+            source: payload.source || null,
+            mediaThrough: payload.media_through || null
         }
     };
 }

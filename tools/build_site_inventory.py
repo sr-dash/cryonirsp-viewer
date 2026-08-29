@@ -162,6 +162,24 @@ def position_angle(reference):
     return math.degrees(math.atan2(y, x)) % 360.0
 
 
+def newest_media_date(available):
+    """The most recent observing date any media exists for.
+
+    New datasets appear at the Data Center as soon as they are calibrated,
+    but the daily context figures and movies are made separately and land
+    later. Anything observed after this date has media that has simply not
+    been published yet — which is a different thing from a date that will
+    never have any, and the site should not present them the same way.
+    """
+    dates = set()
+    for name in available["images"] | available["movies"]:
+        m = re.search(r"(\d{8})\.(?:jpg|mp4)$", name)
+        if m:
+            d = m.group(1)
+            dates.add(f"{d[0:4]}-{d[4:6]}-{d[6:8]}")
+    return max(dates) if dates else None
+
+
 def media_for(date_compact, available):
     """Only reference media that actually exists locally."""
     image = IMAGE_PATTERN.format(date=date_compact)
@@ -201,9 +219,17 @@ def build_record(product, available, stats):
 
     date_compact = start[:10].replace("-", "")
     image, movie, poster = media_for(date_compact, available)
-    if image:
+
+    if image or movie:
+        record_media_status = "present"
         stats["with_media"] += 1
+    elif available.get("through") and start[:10] > available["through"]:
+        # Observed after the last day any media exists for: not missing,
+        # just not made yet.
+        record_media_status = "pending"
+        stats["media_pending"] += 1
     else:
+        record_media_status = "absent"
         stats["without_media"] += 1
 
     primary_line = classification.get("primary_line") or {}
@@ -317,6 +343,7 @@ def build_record(product, available, stats):
     record["context_image"] = image
     record["context_movie"] = movie
     record["context_movie_thumbnail"] = poster
+    record["media_status"] = record_media_status
 
     # ---- new in v1.0.0: product context ----
     # experiment_description is operator-authored free text. It is escaped at
@@ -444,6 +471,10 @@ def main():
         if not available["movies"]:
             print(f"warning: no movies found in {args.movie_dir}", file=sys.stderr)
 
+    available["through"] = newest_media_date(available)
+    if available["through"]:
+        print(f"media       published through {available['through']}")
+
     stats = Counter()
     datasets = OrderedDict()
     aliases = {}
@@ -472,6 +503,7 @@ def main():
         f"({source.get('n_products', len(products))} products) "
         f"via tools/build_site_inventory.py"
     )
+    payload["media_through"] = available.get("through")
     payload["dataset_aliases"] = aliases
     payload["datasets"] = datasets
 
@@ -526,7 +558,11 @@ def main():
     print(f"enriched   {stats['enriched']} with structure, "
           f"{stats['unenriched']} awaiting enrichment")
     print(f"media      {stats['with_media']} with context media, "
-          f"{stats['without_media']} without")
+          f"{stats['without_media']} without, "
+          f"{stats['media_pending']} awaiting publication")
+    if stats["media_pending"]:
+        print(f"           (observed after {available.get('through')}, "
+              f"imagery not made yet — a later run will pick it up)")
 
     sp = sum(1 for r in datasets.values() if r.get("spectral_line"))
     ci = sum(1 for r in datasets.values() if r.get("filter_passband"))

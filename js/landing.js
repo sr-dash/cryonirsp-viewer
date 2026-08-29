@@ -30,6 +30,19 @@ const ION = {
     six_1430:    ['Si X', '1430.0 nm']
 };
 
+// The archive rebuilds itself on the 3rd of each month; say when that next
+// falls rather than leaving the reader to wonder how stale this is.
+function nextRefresh() {
+    const now = new Date();
+    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 3, 6, 20));
+    if (next <= now) next.setUTCMonth(next.getUTCMonth() + 1);
+    const days = Math.ceil((next - now) / 86400000);
+    return {
+        date: next.toISOString().slice(0, 10),
+        when: days <= 1 ? 'tomorrow' : `in ${days} days`
+    };
+}
+
 export function renderLanding(el, records, meta) {
     const total = records.length;
 
@@ -72,6 +85,8 @@ export function renderLanding(el, records, meta) {
     const bytes = records.reduce((a, r) => a + (r.sizeGiB || 0), 0);
     const superseded = records.reduce((a, r) => a + r.superseded.length, 0);
     const offLimb = records.filter((r) => r.rbin === 'near' || r.rbin === 'far').length;
+    const pendingMedia = records.filter((r) => r.mediaStatus === 'pending').length;
+    const refresh = nextRefresh();
 
     el.innerHTML = `
     <div class="landing-inner">
@@ -172,6 +187,9 @@ export function renderLanding(el, records, meta) {
         </p>
         <div class="stamp">
           <div>Inventory ${meta.generatedAt ? esc(meta.generatedAt.slice(0, 10)) : '—'}</div>
+          <div>Next automatic refresh ${esc(refresh.date)} <span class="soon">${esc(refresh.when)}</span></div>
+          ${meta.mediaThrough ? `<div>Context imagery through ${esc(meta.mediaThrough)}${
+              pendingMedia ? ` <span class="soon">${pendingMedia} awaiting</span>` : ''}</div>` : ''}
           <div>${superseded.toLocaleString()} superseded IDs indexed</div>
         </div>
       </div>

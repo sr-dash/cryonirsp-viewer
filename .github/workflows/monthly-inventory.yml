@@ -108,33 +108,49 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
-          gh release view "$MEDIA_TAG" --json assets --jq '.assets[].name' | sort > have.txt
-          echo "release currently holds $(wc -l < have.txt) assets"
+
+          # Sizes, not just names. The daily figures and movies get
+          # regenerated in place — every one of the 84 changed at once
+          # earlier this year — and a regenerated file keeps its name, so
+          # comparing names alone would never notice.
+          gh release view "$MEDIA_TAG" --json assets \
+            --jq '.assets[] | "\(.name) \(.size)"' | sort > have.txt
+          cut -d' ' -f1 have.txt | sort > have-names.txt
+          echo "release holds $(wc -l < have-names.txt) assets"
 
           : > want.txt
           for d in daily_context_figures cn_daily_movies; do
-            curl -sS -m 90 "$MEDIA_SOURCE/$d/" \
+            curl -sS -m 90 --retry 2 "$MEDIA_SOURCE/$d/" \
               | grep -oE 'href="[^"]+\.(jpg|mp4)"' \
-              | sed -E 's/href="([^"]+)"/\1/' >> want.txt
+              | sed -E "s|href=\"([^\"]+)\"|\1 $d|" >> want.txt
           done
           sort -u want.txt -o want.txt
           echo "source lists $(wc -l < want.txt) assets"
 
-          comm -13 have.txt want.txt > new.txt
-          echo "new assets: $(wc -l < new.txt)"
+          # A source listing far smaller than what we already have means the
+          # host is misbehaving, not that files were withdrawn. Refuse it
+          # rather than acting on a bad listing.
+          if [ "$(wc -l < want.txt)" -lt "$(( $(wc -l < have-names.txt) / 2 ))" ]; then
+            echo "::warning::Source listed $(wc -l < want.txt) assets against $(wc -l < have-names.txt) in the release; ignoring this listing."
+            exit 1
+          fi
 
           mkdir -p media
-          while read -r f; do
-            case "$f" in
-              daily_context_*) sub=daily_context_figures ;;
-              *)               sub=cn_daily_movies ;;
-            esac
+          while read -r f sub; do
+            remote=$(curl -sSI -m 60 "$MEDIA_SOURCE/$sub/$f" \
+                     | awk 'tolower($1)=="content-length:"{gsub(/\r/,"",$2);print $2}')
+            local=$(awk -v n="$f" '$1==n{print $2}' have.txt)
+            if [ -n "$local" ] && [ "$remote" = "$local" ]; then continue; fi
+            echo "  fetching $f (remote ${remote:-?}, held ${local:-none})"
             curl -sS -m 900 --retry 3 -o "media/$f" "$MEDIA_SOURCE/$sub/$f" || rm -f "media/$f"
-          done < new.txt
+          done < want.txt
 
-          if [ -n "$(ls -A media 2>/dev/null)" ]; then
+          n=$(ls media 2>/dev/null | wc -l | tr -d ' ')
+          if [ "$n" -gt 0 ]; then
             gh release upload "$MEDIA_TAG" media/* --clobber
-            echo "uploaded $(ls media | wc -l) new assets"
+            echo "uploaded $n new or regenerated assets"
+          else
+            echo "media already current"
           fi
 
           gh release view "$MEDIA_TAG" --json assets --jq '.assets[].name' > media-manifest.txt

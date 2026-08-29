@@ -297,6 +297,22 @@ export function renderDetail(el, r) {
                 </div>
             </div>
 
+            ${(!r.image && !r.movie && r.mediaStatus === 'pending') ? `
+            <div class="dsec" style="--i:1">
+                <h4>Context media</h4>
+                <div class="pending-media">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2"/>
+                    </svg>
+                    <div>
+                        <b>Not published yet.</b>
+                        The daily context figure and movie for ${esc(r.date)} are made separately
+                        from the data and have not appeared yet. This record will pick them up on a
+                        later refresh &mdash; nothing is missing from the dataset itself.
+                    </div>
+                </div>
+            </div>` : ''}
+
             ${(r.image || r.movie) ? `
             <div class="dsec" style="--i:1">
                 <h4>Context media</h4>

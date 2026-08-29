@@ -589,3 +589,15 @@ body.lb-locked{ overflow:hidden; }
     .lb-frame{ padding:14px; }
     .lb-bar{ flex-direction:column; align-items:flex-start; gap:8px; }
 }
+
+/* New datasets can appear at the Data Center before their daily imagery is
+   made. That is not the same as a date that will never have any, and the
+   panel should not present the two identically. */
+.pending-media{
+    display:flex; gap:11px; align-items:flex-start;
+    border:1px solid var(--line); border-left:3px solid var(--dim);
+    border-radius:2px; padding:12px 14px;
+    font-size:12.5px; line-height:1.55; color:var(--muted);
+}
+.pending-media svg{ color:var(--dim); flex:none; margin-top:1px; }
+.pending-media b{ color:var(--text); font-weight:600; }
