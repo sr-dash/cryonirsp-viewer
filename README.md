@@ -1,8 +1,7 @@
 # Cryo-NIRSP Archive — next
 
-A redesign of the Cryo-NIRSP Level-1 archive browser. Sister repo to `viewer/`; the two read the
-same published inventory and the same media release, so they can run side by side against identical
-data while this one is evaluated.
+The Cryo-NIRSP Level-1 archive browser. A static site — plain ES modules, hand-written CSS, no
+build step and no dependencies — deployed to GitHub Pages by copying files.
 
 ## Run it
 
@@ -109,13 +108,13 @@ inventory with:
 python3 tools/build_site_inventory.py \
     ~/NSO/Work/GIT-Projects/CryoNIRSP-Datasets/cryonirsp_inventory.json \
     -o data/cryonirsp_dataset_details.json \
-    --image-dir ../viewer/cn_daily_context_figures \
-    --movie-dir ../viewer/cn_daily_movies
+    --image-dir cn_daily_context_figures \
+    --movie-dir cn_daily_movies
 ```
 
 The two media directories are the existence oracle: a media filename is only written into the
 inventory when the file is actually present, so the site cannot reference a movie that is not there.
-They live in `viewer/` and are gitignored in both repos — media is served from the `media-v2`
+They sit alongside this file and are gitignored — media is served from the `media-v2`
 release on `sr-dash/cryonirsp-media`, pinned by `RELEASE_TAG` in `js/data.js`.
 
 Validate a candidate inventory against the contract (`data/SCHEMA.md`):
@@ -129,8 +128,7 @@ python3 tools/validate_inventory.py data/cryonirsp_dataset_details.json
 The build step now carries `radial_distance` and `position_angle_deg` straight from the generator,
 which measures both **to the reference pointing** rather than to the footprint centroid. Deriving
 them in the browser instead gave a number about 0.07 R☉ higher, which would have put the same
-observation at two different heights depending on which page you were reading. `viewer/` does not
-have this change yet.
+observation at two different heights depending on which page you were reading. Both the site and the build step use it.
 
 ## Layout
 

@@ -67,7 +67,7 @@ export function renderLanding(el, records, meta) {
     const maxMonth = Math.max(1, ...Object.values(monthCounts));
     const busiest = months.reduce((a, m) => monthCounts[m] > monthCounts[a] ? m : a, months[0]);
 
-    const nights = new Set(records.map((r) => r.date)).size;
+    const observingDays = new Set(records.map((r) => r.date)).size;
     const programs = new Set(records.map((r) => r.program)).size;
     const bytes = records.reduce((a, r) => a + (r.sizeGiB || 0), 0);
     const superseded = records.reduce((a, r) => a + r.superseded.length, 0);
@@ -96,7 +96,7 @@ export function renderLanding(el, records, meta) {
 
           <div class="figures">
             <div><div class="n">${total.toLocaleString()}</div><div class="k">Products</div></div>
-            <div><div class="n">${nights}</div><div class="k">Observing nights</div></div>
+            <div><div class="n">${observingDays}</div><div class="k">Observing days</div></div>
             <div><div class="n">${programs}</div><div class="k">Programs</div></div>
             <div><div class="n">${(bytes / 1024).toFixed(1)}<small> TiB</small></div><div class="k">Catalogued</div></div>
           </div>
