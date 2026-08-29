@@ -19,8 +19,12 @@ on:
     - cron: '20 6 3 * *'
   workflow_dispatch:
     inputs:
+      recent:
+        description: 'Re-enrich the N most recently observed products, to exercise the pipeline against a bounded slice. Leave 0 for a normal incremental run.'
+        type: string
+        default: '0'
       rebuild:
-        description: 'Re-enrich every product from scratch, ignoring saved state'
+        description: 'Re-enrich the ENTIRE archive. Roughly five hours of runner time and several runs to finish — use only after a dependency bump.'
         type: boolean
         default: false
 
@@ -94,15 +98,28 @@ jobs:
       # A partially enriched archive is a supported state, not a broken one:
       # geometry is tier A-prime in the contract precisely because it arrives
       # later than the rest of the record.
+      # Enrich in chunks against a wall clock, saving state after each one.
+      #
+      # A month brings at most a couple of hundred new datasets, and a shared
+      # runner enriches about three a minute, so the normal case is well
+      # inside the budget. The budget exists for the abnormal case: it caps
+      # what any single run will attempt, and the checkpoint after each chunk
+      # means a run that is cut short costs one chunk rather than everything
+      # before it.
+      #
+      # A partially enriched archive is a supported state. Those products
+      # appear in the site with everything except pointing geometry, which is
+      # why geometry is tier A-prime in the contract.
       - name: Enrich new datasets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENRICH_BUDGET_MIN: 210
-          CHUNK: 120
+          ENRICH_BUDGET_MIN: 100
+          CHUNK: 60
+          EXPECTED_MONTHLY_MAX: 200
         run: |
           remaining() {
             python3 - <<'PY'
-          import json, os
+          import json
           try:
               d = json.load(open('cryonirsp_inventory.json'))
           except Exception:
@@ -111,21 +128,7 @@ jobs:
           PY
           }
 
-          deadline=$(( $(date +%s) + ENRICH_BUDGET_MIN * 60 ))
-          ${{ inputs.rebuild && 'python3 tools/inventory/cryonirsp-inventory enrich --jobs 2 --limit 1 --overwrite || true' || 'true' }}
-
-          while :; do
-            left=$(remaining)
-            echo "::notice::$left products still to enrich"
-            [ "$left" -eq 0 ] && { echo "fully enriched"; break; }
-            if [ "$(date +%s)" -ge "$deadline" ]; then
-              echo "::warning::Enrichment budget reached with $left products still to do. State is saved; the next run continues from here."
-              break
-            fi
-            python3 tools/inventory/cryonirsp-inventory enrich --jobs 2 --limit "$CHUNK"
-
-            # Save after every chunk. A job that dies later must not undo work
-            # that is already done.
+          checkpoint() {
             gzip -kf cryonirsp_inventory.json
             gh release view "$STATE_TAG" >/dev/null 2>&1 \
               || gh release create "$STATE_TAG" --title "Inventory state" \
@@ -133,6 +136,40 @@ jobs:
             gh release upload "$STATE_TAG" cryonirsp_inventory.json.gz --clobber
             rm -f cryonirsp_inventory.json.gz
             echo "checkpoint saved"
+          }
+
+          RECENT='${{ inputs.recent }}'
+          if [ -n "$RECENT" ] && [ "$RECENT" != "0" ]; then
+            echo "::notice::Re-enriching the $RECENT most recent products as a bounded test."
+            python3 tools/inventory/cryonirsp-inventory enrich --jobs 2 --overwrite --recent "$RECENT"
+            checkpoint
+            echo "ENRICH_REMAINING=$(remaining)" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          ${{ inputs.rebuild && 'echo "::warning::Full rebuild requested. This takes several runs to complete." && python3 -c "
+          import json
+          d=json.load(open(\"cryonirsp_inventory.json\"))
+          for p in d[\"products\"].values(): p.pop(\"structure\", None)
+          json.dump(d, open(\"cryonirsp_inventory.json\",\"w\"))
+          print(\"cleared structure on\", len(d[\"products\"]), \"products\")"' || 'true' }}
+
+          backlog=$(remaining)
+          if [ "$backlog" -gt "$EXPECTED_MONTHLY_MAX" ]; then
+            echo "::warning::$backlog products need enriching, well above the $EXPECTED_MONTHLY_MAX a month should bring. Either the saved state was lost or something changed upstream. This run will do what fits in its budget and checkpoint; it will not silently attempt a full rebuild."
+          fi
+
+          deadline=$(( $(date +%s) + ENRICH_BUDGET_MIN * 60 ))
+          while :; do
+            left=$(remaining)
+            echo "::notice::$left products still to enrich"
+            [ "$left" -eq 0 ] && { echo "fully enriched"; break; }
+            if [ "$(date +%s)" -ge "$deadline" ]; then
+              echo "::warning::Budget reached with $left products still to do. State is saved; the next run continues from here."
+              break
+            fi
+            python3 tools/inventory/cryonirsp-inventory enrich --jobs 2 --limit "$CHUNK"
+            checkpoint
           done
 
           echo "ENRICH_REMAINING=$(remaining)" >> "$GITHUB_ENV"

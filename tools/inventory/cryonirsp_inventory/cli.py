@@ -153,6 +153,7 @@ def cmd_enrich(args) -> int:
     root = Path(args.root)
 
     jobs = []
+    candidates = []
     for product in _selected(inventory, args):
         metadata = product.get("metadata") or {}
         asdf_path = metadata.get("asdf_path")
@@ -160,10 +161,24 @@ def cmd_enrich(args) -> int:
             continue
         if product.get("structure") and not args.overwrite:
             continue
+        candidates.append(product)
+
+    # --recent re-reads the most recently OBSERVED products rather than the
+    # first N the inventory happens to list. That is what you want when
+    # exercising the pipeline against a bounded slice: the newest data is
+    # where a change in the upstream format will show up first.
+    if getattr(args, "recent", None):
+        candidates.sort(
+            key=lambda p: ((p.get("active") or {}).get("start_time") or ""),
+            reverse=True,
+        )
+        candidates = candidates[: args.recent]
+
+    for product in candidates:
         jobs.append(
             (
                 product["product_id"],
-                str(root / asdf_path),
+                str(root / (product.get("metadata") or {})["asdf_path"]),
                 (product.get("classification") or {}).get("arm", "SP"),
             )
         )
@@ -528,6 +543,10 @@ def build_parser() -> argparse.ArgumentParser:
     add_filters(enrich)
     enrich.add_argument("--jobs", type=int, default=8, help="parallel workers (default: 8)")
     enrich.add_argument("--overwrite", action="store_true", help="re-enrich existing entries")
+    enrich.add_argument("--recent", type=int, metavar="N",
+                        help="restrict to the N most recently observed products; with "
+                             "--overwrite this re-enriches just that slice, which is how "
+                             "to exercise the pipeline without rebuilding the archive")
     enrich.set_defaults(func=cmd_enrich)
 
     tags = subparsers.add_parser(

@@ -30,20 +30,36 @@ restored:
 | **total** | **~3 min** | **~20 min** | **several runs** |
 
 **Enrichment on a shared runner is about five times slower than on a
-laptop** — measured at roughly 3 products per minute against 15 locally, and
-the difference is not just the worker count. A full 1,002-product rebuild is
-therefore around five hours of enrichment, which does not fit in a six hour
-job with any margin worth having.
+laptop** — roughly 3 products per minute against 15 locally, and the
+difference is not just the worker count.
 
-So enrichment runs in chunks against a wall clock, and saves state after every
-chunk. No single run can overrun its budget, and a run that dies costs one
-chunk rather than everything before it. The next run resumes exactly where the
-last stopped, because enrich skips whatever already carries a structure block.
+That number only matters for a full rebuild, which is not something this
+pipeline should ever do on a schedule. A month brings at most a couple of
+hundred new datasets, so the normal run is around an hour at worst and
+usually minutes.
 
-A partially enriched archive is a supported state, not a broken one. Those
-products appear in the site with everything except pointing geometry, which is
-why geometry is tier A-prime in the contract rather than tier A. A build from
-a half-enriched inventory validates with zero errors.
+Enrichment runs in chunks against a 100 minute budget and uploads state after
+every chunk, so no run can overrun and a run that is cut short costs one chunk
+rather than everything before it. If the backlog exceeds 200 products the run
+says so loudly — either the saved state was lost or something changed upstream
+— and still does only what fits, rather than silently attempting five hours of
+work.
+
+### Rebuilding on purpose
+
+`workflow_dispatch` takes two knobs:
+
+- **`recent: N`** re-enriches the N most recently observed products. This is
+  how to exercise the pipeline against real data without rebuilding anything:
+  the newest observations are where an upstream format change shows up first.
+  100 takes about half an hour.
+- **`rebuild: true`** clears every structure block and starts over. Five hours
+  of runner time spread across several runs. Worth doing after a dependency
+  bump so the whole archive is read by one set of versions, and not otherwise.
+
+The `inventory-state` release was seeded from a complete, verified local
+inventory, so no run has ever had to build the archive from nothing and none
+should need to.
 
 ## State
 
