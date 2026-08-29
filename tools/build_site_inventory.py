@@ -153,13 +153,22 @@ def duration_seconds(structure, start, end):
 
 
 def position_angle(reference):
-    """Position angle of the reference pointing, degrees CCW from solar west."""
+    """Position angle of the reference pointing, degrees CCW from solar west.
+
+    Rounded, and not for tidiness. atan2 differs in the last bit or two
+    between one machine's libm and another's, so an unrounded value makes
+    a handful of records appear changed in every monthly pull request for
+    no reason at all — which would bury a real change among phantom ones
+    and undermine the reason those reviews exist. Six decimals is about
+    four milliarcseconds, far finer than the instrument knows where it is
+    pointing, and it makes the build reproducible across machines.
+    """
     if not isinstance(reference, list) or len(reference) < 2:
         return None
     x, y = num(reference[0]), num(reference[1])
     if x is None or y is None:
         return None
-    return math.degrees(math.atan2(y, x)) % 360.0
+    return round(math.degrees(math.atan2(y, x)) % 360.0, 6)
 
 
 def newest_media_date(available):
