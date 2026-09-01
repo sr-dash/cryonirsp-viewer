@@ -14,7 +14,7 @@ transforms it into the flat, valid, minified shape described here:
 
 ```bash
 python3 tools/build_site_inventory.py \
-    ~/NSO/Work/GIT-Projects/CryoNIRSP-Datasets/cryonirsp_inventory.json \
+    ~/NSO/03-Projects/code/CryoNIRSP-Datasets/cryonirsp_inventory.json \
     -o data/cryonirsp_dataset_details.json
 ```
 

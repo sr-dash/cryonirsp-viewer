@@ -7,7 +7,7 @@ The site needs a flat, valid, minified file in the shape data/SCHEMA.md
 describes. This script is the seam between the two.
 
     python3 tools/build_site_inventory.py \
-        ~/NSO/Work/GIT-Projects/CryoNIRSP-Datasets/cryonirsp_inventory.json \
+        ~/NSO/03-Projects/code/CryoNIRSP-Datasets/cryonirsp_inventory.json \
         -o data/cryonirsp_dataset_details.json
 
 One site record per product, representing that product's ACTIVE dataset.

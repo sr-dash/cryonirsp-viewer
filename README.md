@@ -151,7 +151,7 @@ inventory with:
 
 ```bash
 python3 tools/build_site_inventory.py \
-    ~/NSO/Work/GIT-Projects/CryoNIRSP-Datasets/cryonirsp_inventory.json \
+    ~/NSO/03-Projects/code/CryoNIRSP-Datasets/cryonirsp_inventory.json \
     -o data/cryonirsp_dataset_details.json \
     --image-dir cn_daily_context_figures \
     --movie-dir cn_daily_movies
