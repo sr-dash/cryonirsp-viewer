@@ -13,6 +13,24 @@
 <meta name="theme-color" content="#1B242C" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ECF0F5" media="(prefers-color-scheme: light)">
 <meta name="color-scheme" content="dark light">
+<script>
+/* ?embed=1 shows only the pointing rose, for other pages to frame.
+   theme=light|dark  follows the host page instead of the reader's setting.
+   accent=RRGGBB     draws the wedges in the host's colour (hex, no #). */
+(function () {
+    var q = new URLSearchParams(location.search);
+    if (q.get('embed') !== '1') return;
+    var d = document.documentElement;
+    d.classList.add('embed');
+    var t = q.get('theme');
+    if (t === 'light' || t === 'dark') d.setAttribute('data-theme', t);
+    var a = q.get('accent');
+    if (a && /^[0-9a-fA-F]{6}$/.test(a)) {
+        d.style.setProperty('--accent', '#' + a);
+        d.style.setProperty('--accent-ink', '#' + a);   /* text in the same colour */
+    }
+})();
+</script>
 
 <!-- Google Scholar / citation -->
 <meta name="citation_title" content="Cryo-NIRSP Archive: a searchable inventory of DKIST coronal infrared spectropolarimetry">

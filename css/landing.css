@@ -153,3 +153,65 @@
 .btn:active{ transform:translateY(1px); }
 
 .foot .stamp .soon{ color:var(--accent-ink); }
+
+/* =====================================================
+   EMBED (?embed=1)
+
+   Only the pointing rose, sized to whatever frame holds
+   it. The ground is transparent so the host page shows
+   through and the chart sits on the host's own colour.
+===================================================== */
+html.embed,
+html.embed body { height: 100%; margin: 0; background: transparent; overflow: hidden; }
+html.embed body > *:not(.embed-root) { display: none !important; }
+
+.embed-root {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);   /* never wider than the frame */
+    justify-items: center;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: 14px 10px 10px;
+    box-sizing: border-box;
+}
+.embed-root .rose { height: 100%; aspect-ratio: 1; max-width: 100%; }
+.embed-root .rose svg { width: 100%; height: 100%; }
+.embed-cap {
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0 6px;
+    margin: 0;
+    font: 11px/1.4 'JetBrains Mono', ui-monospace, monospace;
+    color: var(--dim);
+    text-align: center;
+}
+
+/* Heading: what the figure is, and over what span. Theme tokens throughout,
+   so it reads on the host's ground in either theme. */
+.embed-head { text-align: center; display: grid; gap: 2px; max-width: 100%; }
+.embed-kicker {
+    margin: 0;
+    font: 500 10px/1.3 var(--f-mono);
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent-ink);
+}
+.embed-title {
+    margin: 0;
+    font: 500 21px/1.15 var(--f-display);
+    letter-spacing: -.01em;
+    color: var(--text);
+}
+.embed-sub { margin: 0; font: 400 12px/1.4 var(--f-body); color: var(--muted); }
+
+/* The count in the middle of the disk. */
+.rose-count {
+    font-family: var(--f-display); font-size: 46px; font-weight: 500;
+    fill: var(--text); letter-spacing: -.02em;
+}
+.rose-count-k {
+    font-family: var(--f-mono); font-size: 13px; letter-spacing: .14em;
+    text-transform: uppercase; fill: var(--muted);
+}

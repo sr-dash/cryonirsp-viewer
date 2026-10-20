@@ -43,10 +43,10 @@ function nextRefresh() {
     };
 }
 
-export function renderLanding(el, records, meta) {
-    const total = records.length;
-
-    // ---- pointing rose ----
+// The pointing rose: the solar disk, with one wedge per 15° of position
+// angle whose length is the number of products pointed there. Shared by the
+// landing page and the embed view, so the two can never disagree.
+export function pointingRose(records) {
     const sectors = new Array(24).fill(0);
     records.forEach((r) => { if (r.pa !== null) sectors[Math.floor(r.pa / 15) % 24]++; });
     const maxSec = Math.max(1, ...sectors);
@@ -67,6 +67,32 @@ export function renderLanding(el, records, meta) {
     const gapLabel = gaps.length
         ? `PA ${gaps[0] * 15}°–${(gaps[gaps.length - 1] + 1) * 15}°`
         : null;
+
+
+    const offLimb = records.filter((r) => r.rbin === 'near' || r.rbin === 'far').length;
+    const svg = `
+          <svg viewBox="0 0 600 600" role="img" aria-label="Pointing coverage by position angle">
+            <defs>
+              <radialGradient id="halo"><stop offset="55%" stop-color="var(--accent)" stop-opacity="0.14"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></radialGradient>
+              <radialGradient id="disk"><stop offset="0%" stop-color="var(--sunk)"/><stop offset="100%" stop-color="var(--panel)"/></radialGradient>
+            </defs>
+            <circle cx="300" cy="300" r="250" fill="url(#halo)"/>
+            <circle cx="300" cy="300" r="176" fill="none" stroke="var(--line)" stroke-dasharray="2 5"/>
+            <circle cx="300" cy="300" r="220" fill="none" stroke="var(--line)" stroke-dasharray="2 5"/>
+            <g>${wedges}</g>
+            <circle cx="300" cy="300" r="132" fill="url(#disk)" stroke="var(--edge)"/>
+            <circle cx="300" cy="300" r="132" fill="none" stroke="var(--accent)" stroke-opacity="0.5" stroke-width="1.4"/>
+            <text x="300" y="152" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">N</text>
+            <text x="448" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">W</text>
+            <text x="152" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">E</text>
+          </svg>`;
+    return { svg, gapLabel, offLimb };
+}
+
+export function renderLanding(el, records, meta) {
+    const total = records.length;
+
+    const { svg: roseSvg, gapLabel } = pointingRose(records);
 
     // ---- per-line counts ----
     const lineCounts = {};
@@ -118,21 +144,7 @@ export function renderLanding(el, records, meta) {
         </div>
 
         <div class="rose">
-          <svg viewBox="0 0 600 600" role="img" aria-label="Pointing coverage by position angle">
-            <defs>
-              <radialGradient id="halo"><stop offset="55%" stop-color="var(--accent)" stop-opacity="0.14"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></radialGradient>
-              <radialGradient id="disk"><stop offset="0%" stop-color="var(--sunk)"/><stop offset="100%" stop-color="var(--panel)"/></radialGradient>
-            </defs>
-            <circle cx="300" cy="300" r="250" fill="url(#halo)"/>
-            <circle cx="300" cy="300" r="176" fill="none" stroke="var(--line)" stroke-dasharray="2 5"/>
-            <circle cx="300" cy="300" r="220" fill="none" stroke="var(--line)" stroke-dasharray="2 5"/>
-            <g>${wedges}</g>
-            <circle cx="300" cy="300" r="132" fill="url(#disk)" stroke="var(--edge)"/>
-            <circle cx="300" cy="300" r="132" fill="none" stroke="var(--accent)" stroke-opacity="0.5" stroke-width="1.4"/>
-            <text x="300" y="152" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">N</text>
-            <text x="448" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">W</text>
-            <text x="152" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">E</text>
-          </svg>
+          ${roseSvg}
           <div class="caption">
             <b>Pointing coverage, all ${total.toLocaleString()} products</b>
             Spoke length = observations per 15° sector.

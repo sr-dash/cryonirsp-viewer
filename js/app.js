@@ -7,7 +7,7 @@ import { emptyQuery, runQuery, toggleFacet, toParams, fromParams,
          parseInput, describe, isEmpty, GROUPS } from './query.js';
 import { renderRail, renderResults, renderDetail, LABELS, esc } from './views.js';
 import { renderAside, wireDisk, R_BINS } from './aside.js';
-import { renderLanding } from './landing.js';
+import { renderLanding, pointingRose } from './landing.js';
 import { initTheme } from './theme.js';
 import { animateCounts, tweenNumber, recallCount, rememberCount } from './motion.js';
 import { initLightbox, isOpen as lightboxOpen } from './lightbox.js';
@@ -45,12 +45,69 @@ const $ = (s) => document.querySelector(s);
         return;
     }
 
+    // ?embed=1: only the pointing rose, for other pages to frame. The head
+    // script has already applied any theme and accent the host passed in.
+    if (document.documentElement.classList.contains('embed')) {
+        renderEmbed(state.archive.records);
+        return;
+    }
+
     initTheme();
     initLightbox();
     readURL();
     wireChrome();
     render();
 })();
+
+// -----------------------------------------------------
+// embed
+// -----------------------------------------------------
+
+function renderEmbed(records) {
+    const { svg: full600, offLimb } = pointingRose(records);
+    const total = records.length;
+    const days = new Set(records.map((r) => r.date).filter(Boolean)).size;
+    const months = records.map((r) => r.month).filter(Boolean).sort();
+    const fmt = (m) => new Date(`${m}-01T00:00Z`).toLocaleString('en-US',
+        { month: 'short', year: 'numeric', timeZone: 'UTC' });
+    const span = months.length ? `${fmt(months[0])} – ${fmt(months[months.length - 1])}` : '';
+
+    // The landing page leaves room around the rose for its layout; in a
+    // frame that margin is wasted, so crop to the outermost ring and wedge.
+    // The disk itself is empty on the landing page, where the headline
+    // carries the count; here the count goes in the middle of the Sun.
+    const svg = full600
+        .replace('viewBox="0 0 600 600"', 'viewBox="24 24 552 552"')
+        .replace('</svg>', `
+            <text x="300" y="302" text-anchor="middle" class="rose-count">${total.toLocaleString()}</text>
+            <text x="300" y="330" text-anchor="middle" class="rose-count-k">products</text>
+          </svg>`);
+    const app = new URL('./', location.href);
+
+    const root = document.createElement('div');
+    root.className = 'embed-root';
+    root.innerHTML = `
+      <header class="embed-head">
+        <p class="embed-kicker">DKIST · Cryo-NIRSP</p>
+        <h1 class="embed-title">Every coronal pointing</h1>
+        <p class="embed-sub">${span} · ${days} observing days</p>
+      </header>
+      <div class="rose">${svg}</div>
+      <p class="embed-cap">
+        Wedge length: products per 15° of position angle ·
+        ${Math.round(100 * offLimb / total)}% above the limb
+      </p>`;
+    document.body.appendChild(root);
+
+    // A wedge opens the full archive filtered to that sector, in a new tab:
+    // the frame's host page stays where it is.
+    root.addEventListener('click', (e) => {
+        const w = e.target.closest('.rose-wedge');
+        if (!w) return;
+        const a = Number(w.dataset.pa);
+        window.open(`${app}?pa=${a}-${a + 15}`, '_blank', 'noopener');
+    });
+}
 
 // -----------------------------------------------------
 // URL <-> state
