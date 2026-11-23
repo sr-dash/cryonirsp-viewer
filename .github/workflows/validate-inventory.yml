@@ -124,6 +124,18 @@ jobs:
             OLD=0
           fi
 
+          # Both counts come from a subshell, and an empty one turns the
+          # comparison below into a bash syntax error rather than a verdict —
+          # a confusing red check that says nothing about the inventory. An
+          # uncountable head is a real failure; an uncountable base only means
+          # there is nothing to compare against, so say so and carry on.
+          case "$NEW" in
+            ''|*[!0-9]*) echo "::error::could not count records in this inventory"; exit 1 ;;
+          esac
+          case "$OLD" in
+            ''|*[!0-9]*) echo "::warning::could not count records on ${{ github.base_ref }}; skipping the loss check"; OLD=0 ;;
+          esac
+
           echo "base: $OLD records -> head: $NEW records"
           echo "- records: **$OLD → $NEW**" >> "$GITHUB_STEP_SUMMARY"
 
