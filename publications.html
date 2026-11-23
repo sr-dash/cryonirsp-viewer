@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DKIST Publications — refereed papers using Inouye Solar Telescope data</title>
+
+<meta name="description" content="Refereed publications that analyse data from the Daniel K. Inouye Solar Telescope, grouped by instrument — Cryo-NIRSP, ViSP, VBI, DL-NIRSP and VTF — with citation counts from NASA ADS, BibTeX for every entry, and links from each paper to the Cryo-NIRSP dataset IDs it cites. Instrument and observatory papers are listed separately from papers using the data.">
+<meta name="keywords" content="DKIST publications, DKIST bibliography, Inouye Solar Telescope papers, Cryo-NIRSP publications, ViSP publications, VBI publications, DL-NIRSP, VTF, solar physics bibliography, NASA ADS, refereed solar papers, coronal magnetometry papers, solar telescope citations, BibTeX, National Solar Observatory, NSO, DKIST data use">
+<meta name="author" content="Soumyaranjan Dash">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#1B242C" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ECF0F5" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cryo-NIRSP Archive">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="DKIST Publications — the refereed record, by instrument">
+<meta property="og:description" content="Refereed papers that analyse DKIST data, grouped by instrument, with ADS citation counts, BibTeX, and links from each paper to the dataset IDs it cites.">
+<meta property="og:url" content="https://sr-dash.github.io/cryonirsp-viewer/publications.html">
+<meta property="og:image" content="https://sr-dash.github.io/cryonirsp-viewer/assets/icons/og_preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cryo-NIRSP Archive — DKIST publications by instrument.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DKIST Publications — the refereed record, by instrument">
+<meta name="twitter:description" content="Refereed papers analysing DKIST data, by instrument, with ADS citation counts and BibTeX.">
+<meta name="twitter:image" content="https://sr-dash.github.io/cryonirsp-viewer/assets/icons/og_preview.jpg">
+
+<link rel="canonical" href="https://sr-dash.github.io/cryonirsp-viewer/publications.html">
+
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "DKIST Publications",
+  "description": "Refereed publications analysing data from the Daniel K. Inouye Solar Telescope, grouped by instrument, with citation counts from NASA ADS and BibTeX for every entry.",
+  "url": "https://sr-dash.github.io/cryonirsp-viewer/publications.html",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Cryo-NIRSP Archive",
+    "url": "https://sr-dash.github.io/cryonirsp-viewer/"
+  },
+  "about": {
+    "@type": "Observatory",
+    "name": "Daniel K. Inouye Solar Telescope",
+    "alternateName": "DKIST"
+  },
+  "creator": {
+    "@type": "Person",
+    "name": "Soumyaranjan Dash",
+    "affiliation": { "@type": "Organization", "name": "National Solar Observatory" }
+  },
+  "license": "https://creativecommons.org/licenses/by/4.0/"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<script>
+  // Applied before first paint so an explicit choice never flashes the other theme.
+  try {
+    var t = localStorage.getItem('cryonirsp_theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/pubs.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <a class="brand" href="./">
+      <span class="name">Cryo&#8209;NIRSP Archive</span>
+      <span class="eyebrow">DKIST &middot; Haleakal&#257;</span>
+    </a>
+    <nav>
+      <a href="./">Overview</a>
+      <a href="./?view=search">Search</a>
+      <a href="publications.html" class="on" aria-current="page">Publications</a>
+      <button class="themetoggle" id="themeToggle" aria-label="Switch theme">
+        <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+        </svg>
+        <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2.4v2.2M12 19.4v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.4 12h2.2M19.4 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/>
+        </svg>
+      </button>
+    </nav>
+  </header>
+
+  <main class="pubs" id="pubs">
+    <noscript>
+      <p class="pub-note">This page builds its list in the browser. The underlying
+      record is <a href="data/dkist_publications.json">data/dkist_publications.json</a>.</p>
+    </noscript>
+  </main>
+
+</div>
+
+<script type="module" src="js/pubs.js"></script>
+
+</body>
+</html>

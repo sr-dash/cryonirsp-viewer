@@ -11,19 +11,11 @@ import { LINE_COLOR, LINE_SHORT, TARGET_LABEL, MODE_LABEL, TAG_CATEGORY_LABEL,
          fmtDuration, fmtSize, utcStamp, fmtDate } from './data.js';
 import { GROUPS, facetCounts } from './query.js';
 
-const E = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-export const esc = (v) => v === null || v === undefined ? '' : String(v).replace(/[&<>"']/g, (c) => E[c]);
-
-// A URL bound for href. The tag and publication links come from the daily
-// summary page, so they are third-party data: anything that is not plain
-// http(s) or a same-origin relative path is dropped rather than rendered,
-// which keeps a javascript: URL from ever reaching an attribute.
-export const escURL = (v) => {
-    if (v === null || v === undefined) return '';
-    const u = String(v).trim();
-    if (u.startsWith('//')) return '';           // protocol-relative: off-site
-    return (/^https?:\/\//i.test(u) || /^[\w./?=&#%-]+$/.test(u)) ? esc(u) : '';
-};
+// Shared with the publications page, which needs the same escaping without
+// the archive renderer behind it. Re-exported because lightbox.js and app.js
+// have always imported them from here.
+import { esc, escURL } from './escape.js';
+export { esc, escURL };
 
 const lineColor = (k) => LINE_COLOR[k] || 'var(--dim)';
 

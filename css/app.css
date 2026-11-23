@@ -27,6 +27,17 @@
 .masthead nav button:hover{ color:var(--text); }
 .masthead nav button.on{ color:var(--text); border-bottom-color:var(--accent); }
 
+/* The archive switches views in place with buttons; the publications page is a
+   real second document, so the nav carries real links too. Same appearance —
+   the reader should not be able to tell which is which. */
+.masthead nav a{
+    color:inherit; text-decoration:none; padding:4px 0;
+    border-bottom:1px solid transparent;
+}
+.masthead nav a:hover{ color:var(--text); }
+.masthead nav a.on{ color:var(--text); border-bottom-color:var(--accent); }
+.masthead .brand{ text-decoration:none; color:inherit; }
+
 /* =====================================================
    QUERY BAR
 ===================================================== */
