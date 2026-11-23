@@ -345,10 +345,24 @@ jobs:
         run: |
           changed=$(python3 -c '
           import json
+          # generated_at is the only envelope field that moves on its own.
           STAMP = {"generated_at"}
+          # These three are functions of embargo_end_date and the current date,
+          # so they shift every month as embargoes lapse while nothing about the
+          # dataset has changed. The front end recomputes the embargo from the
+          # date anyway (js/data.js, which even has a "lapsed" state for exactly
+          # this), and downloadable and access_status are read nowhere in the
+          # site. Comparing them would mark almost every month as changed and
+          # put the reviewer back where this started. embargo_end_date itself is
+          # NOT ignored, so a genuine change to an embargo still opens.
+          DERIVED = {"embargoed", "downloadable", "access_status"}
           def body(path):
               with open(path) as fh:
-                  return {k: v for k, v in json.load(fh).items() if k not in STAMP}
+                  d = json.load(fh)
+              out = {k: v for k, v in d.items() if k not in STAMP}
+              out["datasets"] = {i: {k: v for k, v in r.items() if k not in DERIVED}
+                                 for i, r in d["datasets"].items()}
+              return out
           new = body("data/cryonirsp_dataset_details.json")
           old = body("/tmp/previous.json")
           print("true" if new != old else "false")
