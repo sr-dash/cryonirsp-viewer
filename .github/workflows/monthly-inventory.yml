@@ -331,6 +331,37 @@ jobs:
       # ---------------------------------------------------------------
       # Always a pull request, never a push to main.
       # ---------------------------------------------------------------
+      # A run that finds nothing new still stamps a fresh generated_at, so the
+      # file always differs byte for byte. Opening a pull request for that
+      # alone teaches the reviewer that these pull requests contain nothing —
+      # which is the one habit this flow exists to prevent. Two of the first
+      # four monthly pull requests carried a timestamp and nothing else.
+      #
+      # generated_at is the only field that moves on its own. source carries
+      # the product count and media_through the imagery coverage; both change
+      # only when something real has, so both stay in the comparison.
+      - name: Is there anything to review?
+        id: substance
+        run: |
+          changed=$(python3 -c '
+          import json
+          STAMP = {"generated_at"}
+          def body(path):
+              with open(path) as fh:
+                  return {k: v for k, v in json.load(fh).items() if k not in STAMP}
+          new = body("data/cryonirsp_dataset_details.json")
+          old = body("/tmp/previous.json")
+          print("true" if new != old else "false")
+          ')
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          if [ "$changed" = "true" ]; then
+            echo "The inventory changed; opening a pull request."
+          else
+            echo "Nothing but the build timestamp moved; no pull request."
+            echo "### No pull request" >> "$GITHUB_STEP_SUMMARY"
+            echo "Nothing changed beyond the build timestamp. The inventory state release was still advanced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Decide how the pull request should read
         id: pr
         run: |
@@ -355,6 +386,7 @@ jobs:
           fi
 
       - name: Open a pull request
+        if: steps.substance.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           add-paths: data/cryonirsp_dataset_details.json

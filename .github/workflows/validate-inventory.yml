@@ -13,11 +13,12 @@ on:
       - 'js/adapt.js'
       - 'tools/validate_inventory.py'
       - '.github/workflows/validate-inventory.yml'
+  # Deliberately unfiltered, unlike the push trigger above. This job is a
+  # required status check on main, and a required check that never runs is a
+  # pull request that can never merge — a paths filter here would block any
+  # pull request that happens not to touch data. Running it on everything
+  # costs about a minute and keeps the gate honest.
   pull_request:
-    paths:
-      - 'data/**'
-      - 'js/adapt.js'
-      - 'tools/validate_inventory.py'
   workflow_dispatch:
 
 permissions:
