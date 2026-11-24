@@ -1,13 +1,13 @@
 {
  "schema_version": "1.0",
- "generated_at": "2026-11-23T22:29:04Z",
- "citations_as_of": "2026-11-20",
+ "generated_at": "2026-11-24T00:21:16Z",
+ "citations_as_of": "2026-11-23",
  "source": "dkist-bib (63 curated papers) via tools/build_publications.py",
  "counts": {
   "total": 63,
   "data": 44,
   "instrument": 19,
-  "citations": 1231,
+  "citations": 1244,
   "citing_dataset_ids": 13,
   "linking_here": 3
  },
@@ -56,7 +56,7 @@
    "instrument": 3,
    "total": 3,
    "cumulative": 4,
-   "citations": 48
+   "citations": 49
   },
   {
    "year": 2018,
@@ -80,7 +80,7 @@
    "instrument": 2,
    "total": 2,
    "cumulative": 9,
-   "citations": 405
+   "citations": 409
   },
   {
    "year": 2021,
@@ -96,7 +96,7 @@
    "instrument": 2,
    "total": 2,
    "cumulative": 16,
-   "citations": 91
+   "citations": 92
   },
   {
    "year": 2023,
@@ -104,7 +104,7 @@
    "instrument": 3,
    "total": 7,
    "cumulative": 23,
-   "citations": 109
+   "citations": 110
   },
   {
    "year": 2024,
@@ -112,7 +112,7 @@
    "instrument": 0,
    "total": 8,
    "cumulative": 31,
-   "citations": 100
+   "citations": 102
   },
   {
    "year": 2025,
@@ -120,7 +120,7 @@
    "instrument": 0,
    "total": 11,
    "cumulative": 42,
-   "citations": 122
+   "citations": 125
   },
   {
    "year": 2026,
@@ -128,7 +128,7 @@
    "instrument": 0,
    "total": 21,
    "cumulative": 63,
-   "citations": 46
+   "citations": 47
   }
  ],
  "papers": [
@@ -150,7 +150,7 @@
    "journal_full": "Nature Astronomy",
    "volume": "10",
    "pages": "42-53",
-   "citations": 22,
+   "citations": 23,
    "doi": "10.1038/s41550-025-02690-9",
    "group": "data",
    "instruments": [
@@ -942,7 +942,7 @@
    "journal_full": "The Astrophysical Journal Letters",
    "volume": "990",
    "pages": "L3",
-   "citations": 19,
+   "citations": 21,
    "doi": "10.3847/2041-8213/adf95e",
    "group": "data",
    "instruments": [
@@ -1162,6 +1162,42 @@
    "bibtex": "@ARTICLE{2025AA...701A..77B,\n       author = {{Barczynski}, Krzysztof and {Janvier}, Miho and {Nelson}, Chris J. and {Schad}, Thomas and {Tritschler}, Alexandra and {Harra}, Louise and {M{\\\"u}ller}, Daniel and {Parenti}, Susanna and {Valori}, Gherardo and {Cauzzi}, Gianna and {Zhu}, Yingjie},\n        title = \"{First coordinated observations between Solar Orbiter and the Daniel K. Inouye Solar Telescope}\",\n      journal = {\\aap},\n     keywords = {Sun: atmosphere, Sun: chromosphere, Sun: corona, Sun: magnetic fields, Sun: photosphere, Sun: transition region, Solar and Stellar Astrophysics},\n         year = 2025,\n        month = sep,\n       volume = {701},\n          eid = {A77},\n        pages = {A77},\n          doi = {10.1051/0004-6361/202554396},\narchivePrefix = {arXiv},\n       eprint = {2507.19198},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2025A&A...701A..77B},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
   },
   {
+   "bibcode": "2025A&A...703L..10Z",
+   "year": 2025,
+   "first_author": "Zeuner, Franziska",
+   "authors": [
+    "Zeuner, Franziska",
+    "Belluzzi, Luca",
+    "Alsina Ballester, Ernest",
+    "Casini, Roberto",
+    "Harrington, David M.",
+    "del Pino Alemán, Tanausú",
+    "Trujillo Bueno, Javier"
+   ],
+   "n_authors": 7,
+   "title": "DKIST resolves sub-arcsec photospheric scattering polarization",
+   "journal": "A&A",
+   "journal_full": "Astronomy & Astrophysics",
+   "volume": "703",
+   "pages": "L10",
+   "citations": 5,
+   "doi": "10.1051/0004-6361/202557465",
+   "group": "data",
+   "instruments": [
+    "ViSP"
+   ],
+   "usage": "Second-arm ViSP Sr I 4607 scattering polarization at sub-arcsec resolution near the limb.",
+   "ids_cited": [
+    "BMNRV",
+    "L1-WTXPV"
+   ],
+   "ids_resolved": {},
+   "products_high": 1,
+   "products_medium": 0,
+   "products_low": 0,
+   "bibtex": "@ARTICLE{2025AA...703L..10Z,\n       author = {{Zeuner}, Franziska and {Belluzzi}, Luca and {Alsina Ballester}, Ernest and {Casini}, Roberto and {Harrington}, David M. and {del Pino Alem{\\'a}n}, Tanaus{\\'u} and {Trujillo Bueno}, Javier},\n        title = \"{DKIST resolves sub-arcsec photospheric scattering polarization}\",\n      journal = {\\aap},\n     keywords = {polarization, scattering, techniques: polarimetric, methods: observational, Sun: photosphere, Solar and Stellar Astrophysics},\n         year = 2025,\n        month = nov,\n       volume = {703},\n          eid = {L10},\n        pages = {L10},\n          doi = {10.1051/0004-6361/202557465},\narchivePrefix = {arXiv},\n       eprint = {2510.20676},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2025A&A...703L..10Z},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
+  },
+  {
    "bibcode": "2025ApJ...988....9C",
    "year": 2025,
    "first_author": "Campbell, Ryan J.",
@@ -1191,42 +1227,6 @@
    "products_medium": 1,
    "products_low": 0,
    "bibtex": "@ARTICLE{2025ApJ...988....9C,\n       author = {{Campbell}, Ryan J. and {Mathioudakis}, M. and {Quintero Noda}, Carlos and {Keys}, P.~H. and {Orozco Su{\\'a}rez}, D.},\n        title = \"{Application of Deep Learning to the Classification of Stokes Profiles: From the Quiet Sun to Sunspots}\",\n      journal = {\\apj},\n     keywords = {Classification, Neural networks, Solar photosphere, Magnetic fields, Solar and Stellar Astrophysics},\n         year = 2025,\n        month = jul,\n       volume = {988},\n       number = {1},\n          eid = {9},\n        pages = {9},\n          doi = {10.3847/1538-4357/addb49},\narchivePrefix = {arXiv},\n       eprint = {2505.14275},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2025ApJ...988....9C},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
-  },
-  {
-   "bibcode": "2025A&A...703L..10Z",
-   "year": 2025,
-   "first_author": "Zeuner, Franziska",
-   "authors": [
-    "Zeuner, Franziska",
-    "Belluzzi, Luca",
-    "Alsina Ballester, Ernest",
-    "Casini, Roberto",
-    "Harrington, David M.",
-    "del Pino Alemán, Tanausú",
-    "Trujillo Bueno, Javier"
-   ],
-   "n_authors": 7,
-   "title": "DKIST resolves sub-arcsec photospheric scattering polarization",
-   "journal": "A&A",
-   "journal_full": "Astronomy & Astrophysics",
-   "volume": "703",
-   "pages": "L10",
-   "citations": 4,
-   "doi": "10.1051/0004-6361/202557465",
-   "group": "data",
-   "instruments": [
-    "ViSP"
-   ],
-   "usage": "Second-arm ViSP Sr I 4607 scattering polarization at sub-arcsec resolution near the limb.",
-   "ids_cited": [
-    "BMNRV",
-    "L1-WTXPV"
-   ],
-   "ids_resolved": {},
-   "products_high": 1,
-   "products_medium": 0,
-   "products_low": 0,
-   "bibtex": "@ARTICLE{2025AA...703L..10Z,\n       author = {{Zeuner}, Franziska and {Belluzzi}, Luca and {Alsina Ballester}, Ernest and {Casini}, Roberto and {Harrington}, David M. and {del Pino Alem{\\'a}n}, Tanaus{\\'u} and {Trujillo Bueno}, Javier},\n        title = \"{DKIST resolves sub-arcsec photospheric scattering polarization}\",\n      journal = {\\aap},\n     keywords = {polarization, scattering, techniques: polarimetric, methods: observational, Sun: photosphere, Solar and Stellar Astrophysics},\n         year = 2025,\n        month = nov,\n       volume = {703},\n          eid = {L10},\n        pages = {L10},\n          doi = {10.1051/0004-6361/202557465},\narchivePrefix = {arXiv},\n       eprint = {2510.20676},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2025A&A...703L..10Z},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
   },
   {
    "bibcode": "2025ApJ...986..169T",
@@ -1279,7 +1279,7 @@
    "journal_full": "Science Advances",
    "volume": "10",
    "pages": "eadq1604",
-   "citations": 40,
+   "citations": 41,
    "doi": "10.1126/sciadv.adq1604",
    "group": "data",
    "instruments": [
@@ -1413,6 +1413,38 @@
    "bibtex": "@ARTICLE{2024ApJ...965...40S,\n       author = {{Schad}, Thomas A. and {Fehlmann}, Andre and {Dima}, Gabriel I. and {Kuhn}, Jeffrey R. and {Scholl}, Isabelle F. and {Harrington}, David and {Rimmele}, Thomas and {Tritschler}, Alexandra and {Paraschiv}, Alin R.},\n        title = \"{Coronagraphic Observations of Si X 1430 nm Acquired by DKIST/Cryo-NIRSP with Methods for Telluric Absorption Correction}\",\n      journal = {\\apj},\n     keywords = {Solar corona, Solar coronal lines, Solar E corona, Astrophysics - Solar and Stellar Astrophysics},\n         year = 2024,\n        month = apr,\n       volume = {965},\n       number = {1},\n          eid = {40},\n        pages = {40},\n          doi = {10.3847/1538-4357/ad2995},\narchivePrefix = {arXiv},\n       eprint = {2402.09632},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2024ApJ...965...40S},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
   },
   {
+   "bibcode": "2024ApJ...973L..10Y",
+   "year": 2024,
+   "first_author": "Yadav, Rahul",
+   "authors": [
+    "Yadav, Rahul",
+    "Kazachenko, Maria D.",
+    "Afanasyev, Andrey N.",
+    "Cauzzi, Gianna",
+    "Reardon, Kevin"
+   ],
+   "n_authors": 5,
+   "title": "Photospheric Pore Rotation Associated with a C-class Flare from Spectropolarimetric Observations with DKIST",
+   "journal": "ApJL",
+   "journal_full": "The Astrophysical Journal Letters",
+   "volume": "973",
+   "pages": "L10",
+   "citations": 6,
+   "doi": "10.3847/2041-8213/ad758d",
+   "group": "data",
+   "instruments": [
+    "ViSP",
+    "VBI"
+   ],
+   "usage": "ViSP Fe I/Na I D1/Ca II 854 rasters and VBI imaging through a C-class flare; pore rotation from inverted photospheric fields.",
+   "ids_cited": [],
+   "ids_resolved": {},
+   "products_high": 0,
+   "products_medium": 5,
+   "products_low": 0,
+   "bibtex": "@ARTICLE{2024ApJ...973L..10Y,\n       author = {{Yadav}, Rahul and {Kazachenko}, Maria D. and {Afanasyev}, Andrey N. and {Cauzzi}, Gianna and {Reardon}, Kevin},\n        title = \"{Photospheric Pore Rotation Associated with a C-class Flare from Spectropolarimetric Observations with DKIST}\",\n      journal = {\\apjl},\n     keywords = {Solar flares, Spectropolarimetry, Astrophysics - Solar and Stellar Astrophysics},\n         year = 2024,\n        month = sep,\n       volume = {973},\n       number = {1},\n          eid = {L10},\n        pages = {L10},\n          doi = {10.3847/2041-8213/ad758d},\narchivePrefix = {arXiv},\n       eprint = {2408.16956},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2024ApJ...973L..10Y},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
+  },
+  {
    "bibcode": "2024NatCo..15.8811A",
    "year": 2024,
    "first_author": "Anan, Tetsu",
@@ -1493,38 +1525,6 @@
    "products_medium": 0,
    "products_low": 0,
    "bibtex": "@ARTICLE{2024ApJ...970..130J,\n       author = {{Judge}, Philip G. and {Kuin}, N. Paul M.},\n        title = \"{On the Intermittency of Hot Plasma Loops in the Solar Corona}\",\n      journal = {\\apj},\n     keywords = {Active Sun, Solar coronal heating, Solar chromosphere, Solar active region magnetic fields, Astrophysics - Solar and Stellar Astrophysics},\n         year = 2024,\n        month = aug,\n       volume = {970},\n       number = {2},\n          eid = {130},\n        pages = {130},\n          doi = {10.3847/1538-4357/ad5202},\narchivePrefix = {arXiv},\n       eprint = {2408.07824},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2024ApJ...970..130J},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
-  },
-  {
-   "bibcode": "2024ApJ...973L..10Y",
-   "year": 2024,
-   "first_author": "Yadav, Rahul",
-   "authors": [
-    "Yadav, Rahul",
-    "Kazachenko, Maria D.",
-    "Afanasyev, Andrey N.",
-    "Cauzzi, Gianna",
-    "Reardon, Kevin"
-   ],
-   "n_authors": 5,
-   "title": "Photospheric Pore Rotation Associated with a C-class Flare from Spectropolarimetric Observations with DKIST",
-   "journal": "ApJL",
-   "journal_full": "The Astrophysical Journal Letters",
-   "volume": "973",
-   "pages": "L10",
-   "citations": 5,
-   "doi": "10.3847/2041-8213/ad758d",
-   "group": "data",
-   "instruments": [
-    "ViSP",
-    "VBI"
-   ],
-   "usage": "ViSP Fe I/Na I D1/Ca II 854 rasters and VBI imaging through a C-class flare; pore rotation from inverted photospheric fields.",
-   "ids_cited": [],
-   "ids_resolved": {},
-   "products_high": 0,
-   "products_medium": 5,
-   "products_low": 0,
-   "bibtex": "@ARTICLE{2024ApJ...973L..10Y,\n       author = {{Yadav}, Rahul and {Kazachenko}, Maria D. and {Afanasyev}, Andrey N. and {Cauzzi}, Gianna and {Reardon}, Kevin},\n        title = \"{Photospheric Pore Rotation Associated with a C-class Flare from Spectropolarimetric Observations with DKIST}\",\n      journal = {\\apjl},\n     keywords = {Solar flares, Spectropolarimetry, Astrophysics - Solar and Stellar Astrophysics},\n         year = 2024,\n        month = sep,\n       volume = {973},\n       number = {1},\n          eid = {L10},\n        pages = {L10},\n          doi = {10.3847/2041-8213/ad758d},\narchivePrefix = {arXiv},\n       eprint = {2408.16956},\n primaryClass = {astro-ph.SR},\n       adsurl = {https://scixplorer.org/abs/2024ApJ...973L..10Y},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
   },
   {
    "bibcode": "2024ApJ...971L...1B",
@@ -1664,7 +1664,7 @@
    "journal_full": "The Astrophysical Journal",
    "volume": "943",
    "pages": "59",
-   "citations": 17,
+   "citations": 18,
    "doi": "10.3847/1538-4357/acabbd",
    "group": "data",
    "instruments": [
@@ -1831,7 +1831,7 @@
    "journal_full": "Solar Physics",
    "volume": "297",
    "pages": "22",
-   "citations": 66,
+   "citations": 67,
    "doi": "10.1007/s11207-022-01954-1",
    "group": "instrument",
    "instruments": [
@@ -2221,7 +2221,7 @@
    "journal_full": "Solar Physics",
    "volume": "295",
    "pages": "172",
-   "citations": 386,
+   "citations": 390,
    "doi": "10.1007/s11207-020-01736-7",
    "group": "instrument",
    "instruments": [
@@ -2365,7 +2365,7 @@
    "journal_full": "Journal of Astronomical Telescopes, Instruments, and Systems",
    "volume": "3",
    "pages": "018002",
-   "citations": 27,
+   "citations": 28,
    "doi": "10.1117/1.JATIS.3.1.018002",
    "group": "instrument",
    "instruments": [
@@ -2476,5 +2476,6 @@
    "products_low": 0,
    "bibtex": "@ARTICLE{2016AN....337.1064T,\n       author = {{Tritschler}, A. and {Rimmele}, T.~R. and {Berukoff}, S. and {Casini}, R. and {Kuhn}, J.~R. and {Lin}, H. and {Rast}, M.~P. and {McMullin}, J.~P. and {Schmidt}, W. and {W{\\\"o}ger}, F. and {DKIST Team}},\n        title = \"{Daniel K. Inouye Solar Telescope: High-resolution observing of the dynamic Sun}\",\n      journal = {Astronomische Nachrichten},\n     keywords = {instrumentation: adaptive optics, instrumentation: high angular resolution, instrumentation: polarimeters, instrumentation: spectrographs, telescopes},\n         year = 2016,\n        month = nov,\n       volume = {337},\n       number = {10},\n        pages = {1064},\n          doi = {10.1002/asna.201612434},\n       adsurl = {https://scixplorer.org/abs/2016AN....337.1064T},\n      adsnote = {Provided by the SAO/NASA Astrophysics Data System}\n}"
   }
- ]
+ ],
+ "refreshed_at": "2026-11-24T00:21:40Z"
 }

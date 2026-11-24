@@ -131,6 +131,24 @@ def main():
     meta = json.loads(meta_file.read_text())
     rows = list(csv.DictReader(csv_file.open()))
 
+    # Two things write citation counts into the output: this script, from
+    # dkist-bib's meta.json, and tools/refresh_ads.py, which asks ADS directly
+    # every month. The monthly refresh is almost always the fresher of the
+    # two, so rebuilding after one would quietly roll every count backwards —
+    # the page would lose a month of citations because somebody regenerated it
+    # to pick up a new paper. Whichever was taken later wins.
+    fresher = {}
+    existing_path = pathlib.Path(args.out)
+    meta_date = dt.datetime.fromtimestamp(
+        meta_file.stat().st_mtime, dt.timezone.utc).strftime("%Y-%m-%d")
+    if existing_path.exists():
+        try:
+            prev = json.loads(existing_path.read_text())
+            if (prev.get("citations_as_of") or "") > meta_date:
+                fresher = {p["bibcode"]: p["citations"] for p in prev["papers"]}
+        except (json.JSONDecodeError, KeyError):
+            pass   # unreadable or an older shape: fall back to meta.json
+
     # Most of the dataset IDs these papers cite belong to ViSP and VBI, which
     # this archive does not hold: of eighty-three cited IDs, six are ours.
     # Linking all of them would send the reader to a search that finds
@@ -171,7 +189,8 @@ def main():
         # Citation counts: meta.json is the ADS record and the CSV was built
         # from it, so they agree — but meta.json is the one a refresh updates,
         # so prefer it and let the CSV stand in if a paper is not in it yet.
-        citations = as_int(m.get("citation_count"), as_int(r.get("citations")))
+        citations = fresher.get(
+            bibcode, as_int(m.get("citation_count"), as_int(r.get("citations"))))
 
         journal = (r.get("journal") or "").strip()
         ids_cited = split_list(r.get("ids_cited_in_paper"))
@@ -239,6 +258,10 @@ def main():
     stamp_file = root / "bib" / "meta.json"
     citations_as_of = dt.datetime.fromtimestamp(
         stamp_file.stat().st_mtime, dt.timezone.utc).strftime("%Y-%m-%d")
+    if fresher:
+        # The counts kept above came from a later ADS refresh, so the date
+        # beside them on the page has to be that one, not this file's mtime.
+        citations_as_of = json.loads(existing_path.read_text())["citations_as_of"]
 
     payload = {
         "schema_version": "1.0",
@@ -262,8 +285,11 @@ def main():
 
     if args.check_against:
         def body(obj):
+            # refreshed_at is written only by tools/refresh_ads.py, so a
+            # file that has been refreshed carries a field this build never
+            # emits. Ignoring it keeps the staleness check about content.
             return {k: v for k, v in obj.items()
-                    if k not in ("generated_at", "source")}
+                    if k not in ("generated_at", "source", "refreshed_at")}
         try:
             existing = json.loads(pathlib.Path(args.check_against).read_text())
         except (OSError, json.JSONDecodeError) as exc:
@@ -277,6 +303,28 @@ def main():
 
     out = pathlib.Path(args.out)
     out.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n")
+
+    # Snapshot the bibcodes dkist-bib has already screened. Without this the
+    # monthly refresh has no way to tell a genuinely new paper from one that
+    # was looked at and rejected years ago: the screening pool is nine hundred
+    # papers and the curated list is sixty-three, so "in the pool but not in
+    # the list" describes almost the whole pool and is no use as a queue.
+    # Bibcodes only — it is a baseline, not a record.
+    pool_file = root / "data" / "candidates.json"
+    if pool_file.exists():
+        screened = sorted(json.loads(pool_file.read_text()))
+        screened_out = out.parent / "publications_screened.json"
+        screened_out.write_text(json.dumps({
+            "note": "Bibcodes already screened by dkist-bib. The monthly ADS "
+                    "refresh reports only papers absent from both this list and "
+                    "the curated one, so a rejected paper is not offered twice.",
+            "as_of": citations_as_of,
+            "bibcodes": screened,
+        }, indent=1) + "\n")
+        print(f"  screened pool   {len(screened)} bibcodes -> {screened_out}")
+    else:
+        print(f"  note: {pool_file} not found; the refresh will have no "
+              f"screening baseline", file=sys.stderr)
 
     c = payload["counts"]
     print(f"wrote {out}")

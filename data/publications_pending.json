@@ -1,0 +1,45 @@
+{
+ "schema_version": "1.0",
+ "candidates": [
+  {
+   "bibcode": "2026PhyEd..61f5009F",
+   "title": "Investigating angular magnification in a low-cost Keplerian telescope using smartphone afocal photography",
+   "year": "2026",
+   "first_author": "Fauzi, Ahmad",
+   "pub": "Physics Education",
+   "citation_count": 0,
+   "hits": [
+    "mention"
+   ],
+   "first_seen": "2026-11-23"
+  },
+  {
+   "bibcode": "2026A&A...715A.146P",
+   "title": "Recovery of the thermodynamic properties of a cool flare loop through two-dimensional non-LTE modelling",
+   "year": "2026",
+   "first_author": "Peat, A. W.",
+   "pub": "Astronomy and Astrophysics",
+   "citation_count": 0,
+   "hits": [
+    "mention",
+    "instr"
+   ],
+   "first_seen": "2026-11-23"
+  },
+  {
+   "bibcode": "2026ApJ..1011..255Y",
+   "title": "What Does 2D Coronal Seismology Measure?",
+   "year": "2026",
+   "first_author": "Yang, Zihao",
+   "pub": "The Astrophysical Journal",
+   "citation_count": 0,
+   "hits": [
+    "mention"
+   ],
+   "first_seen": "2026-11-23"
+  }
+ ],
+ "updated": "2026-11-23",
+ "screened_pool": 898,
+ "note": "Refereed papers whose full text or acknowledgments name DKIST, which are not yet in data/dkist_publications.json. Mentioning DKIST is not using its data: each of these needs reading before it is added. The curated decision belongs in dkist-bib/manifest.py, not here. Entries are appended and never removed automatically — delete one by hand once it has been judged."
+}

@@ -1,0 +1,161 @@
+name: Monthly publications refresh
+
+# Citation counts go stale silently. A page that prints "1,244 citations" with
+# no date is making a claim about today; this keeps that claim true, and the
+# page prints the date either way.
+#
+# Two jobs in one run, and only one of them is allowed to decide anything:
+#
+#   counts     arithmetic. ADS knows the current number, the paper is already
+#              in the list, nothing is judged. Safe unattended.
+#   discovery  appends refereed papers naming DKIST to a review queue and
+#              stops. Whether a paper actually uses DKIST data is a judgement
+#              that belongs to a person reading it, and the curated record
+#              lives in dkist-bib, not here.
+#
+# The fifth rather than the third: the inventory job runs on the third, and
+# two pull requests landing the same morning is how one of them gets merged
+# without being read.
+
+on:
+  schedule:
+    - cron: '10 7 5 * *'
+  workflow_dispatch:
+    inputs:
+      discover:
+        description: 'Also screen ADS for papers not yet in the list'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # An absent token and an expired one behave the same way: the run says
+      # so and stops, rather than opening a pull request that silently zeroes
+      # every citation count. ADS tokens do not expire on a schedule, but they
+      # can be revoked or rotated, and the failure mode is quiet.
+      - name: Check the ADS credential
+        id: cred
+        env:
+          ADS_TOKEN: ${{ secrets.ADS_TOKEN }}
+        run: |
+          if [ -z "$ADS_TOKEN" ]; then
+            echo "state=absent" >> "$GITHUB_OUTPUT"
+            echo "::warning::No ADS_TOKEN secret is set, so citation counts cannot be refreshed. The page keeps the counts it has and the date beside them stays honest."
+            exit 0
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+                   -H "Authorization: Bearer $ADS_TOKEN" \
+                   'https://api.adsabs.harvard.edu/v1/search/query?q=bibcode:2020SoPh..295..172R&fl=bibcode&rows=1')
+          if [ "$code" = "200" ]; then
+            echo "state=ok" >> "$GITHUB_OUTPUT"
+            echo "ADS_TOKEN authenticates."
+          else
+            echo "state=invalid" >> "$GITHUB_OUTPUT"
+            echo "::warning::ADS rejected the token (HTTP $code) — revoked, rotated, or rate-limited. Citation counts are left as they are."
+          fi
+
+      - name: Refresh citation counts
+        if: steps.cred.outputs.state == 'ok'
+        env:
+          ADS_TOKEN: ${{ secrets.ADS_TOKEN }}
+        run: |
+          cp data/dkist_publications.json /tmp/pubs-before.json
+          ARGS=""
+          if [ "${{ github.event_name }}" = "schedule" ] \
+             || [ "${{ inputs.discover }}" = "true" ]; then
+            ARGS="--discover"
+          fi
+          python3 tools/refresh_ads.py $ARGS | tee /tmp/refresh.log
+
+      # The one failure that would matter: a refresh that drops papers or
+      # wipes counts. ADS can reindex and shave a citation or two, so a small
+      # fall is normal; losing a paper never is.
+      - name: Make sure nothing was lost
+        if: steps.cred.outputs.state == 'ok'
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          a = json.load(open('/tmp/pubs-before.json'))
+          b = json.load(open('data/dkist_publications.json'))
+          na, nb = len(a['papers']), len(b['papers'])
+          ca, cb = a['counts']['citations'], b['counts']['citations']
+          print(f"papers {na} -> {nb};  citations {ca} -> {cb} ({cb-ca:+d})")
+          bad = []
+          if nb < na:
+              bad.append(f"paper count fell from {na} to {nb}")
+          if cb < ca * 0.9:
+              bad.append(f"citations fell from {ca} to {cb}, more than a reindex explains")
+          if nb and cb == 0:
+              bad.append("every citation count came back zero")
+          if bad:
+              for m in bad:
+                  print(f"::error::{m}")
+              sys.exit(1)
+          print("The refresh looks like a month of citations.")
+          PY
+
+      - name: Is there anything to review?
+        id: substance
+        if: steps.cred.outputs.state == 'ok'
+        run: |
+          changed=$(python3 -c '
+          import json
+          # refreshed_at moves on every run by construction; everything else
+          # moving means a count changed or a paper surfaced.
+          STAMP = {"refreshed_at", "generated_at", "citations_as_of"}
+          def body(p):
+              with open(p) as fh:
+                  return {k: v for k, v in json.load(fh).items() if k not in STAMP}
+          print("true" if body("data/dkist_publications.json") != body("/tmp/pubs-before.json") else "false")
+          ')
+          # A new name in the review queue is worth a pull request on its own.
+          if [ -n "$(git status --porcelain data/publications_pending.json)" ]; then
+            changed=true
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+          if [ "$changed" = "true" ]; then
+            echo "Citation counts moved or a new paper surfaced."
+          else
+            echo "No citation changed and no new paper appeared; no pull request."
+          fi
+          { echo '### Publications refresh'; echo '```'; cat /tmp/refresh.log; echo '```'; } \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open a pull request
+        if: steps.cred.outputs.state == 'ok' && steps.substance.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            data/dkist_publications.json
+            data/publications_pending.json
+          branch: publications/monthly
+          delete-branch: true
+          commit-message: "Refresh citation counts from ADS"
+          title: "Monthly publications refresh"
+          labels: publications
+          body: |
+            Citation counts refreshed from NASA ADS.
+
+            Anything listed under **new candidates** is a refereed paper whose
+            full text names DKIST and which is not yet in the list. That is not
+            a recommendation: mentioning the telescope is not using its data.
+            Each one needs reading, and the decision belongs in
+            `dkist-bib/manifest.py` — merging this pull request does not add
+            them to the page.
+
+            The run's full report is in the
+            [job summary](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).

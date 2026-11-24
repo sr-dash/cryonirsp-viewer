@@ -146,6 +146,61 @@ it never pushes to `main`. The generator lives in `tools/inventory/`, and
 four gates a run passes before it can reach the site, and the ways it will
 eventually break.
 
+## Publications
+
+`publications.html` lists the refereed papers that analyse DKIST data or describe
+the facility, grouped by instrument, with ADS citation counts, BibTeX for every
+entry and for any filtered selection, and a chart of the yearly output.
+
+The curation is not here. Deciding whether a paper *uses* DKIST data or merely
+mentions it is a judgement made in [`dkist-bib`](../dkist-bib), which screens a
+pool of about nine hundred refereed papers down to the sixty-odd that qualify.
+This repository only renders that decision:
+
+```bash
+python3 tools/build_publications.py ~/NSO/03-Projects/code/dkist-bib
+```
+
+That writes `data/dkist_publications.json` (what the page reads) and
+`data/publications_screened.json` (the bibcodes already judged, so the monthly
+refresh does not offer a rejected paper twice).
+
+Six of the eighty-three dataset IDs these papers cite are held in this archive;
+the rest are ViSP and VBI. Those six link into the search — by product ID where
+the paper cited one, since that is the spelling that survives recalibration —
+and the others are stated rather than linked, because a link that finds nothing
+is worse than a sentence.
+
+BibTeX parsing and LaTeX decoding in `tools/bibparse.py` are a verbatim copy of
+the author's homepage script, which has been meeting real ADS exports for years.
+Fix a parsing bug there first, then bring it across, so divergence shows in a diff.
+
+### Keeping it current
+
+Citation counts come from NASA ADS and need a token — `$ADS_TOKEN`, or
+`~/.ads/dev_key`, which is what the other tools here read:
+
+```bash
+python3 tools/refresh_ads.py --discover
+```
+
+Two jobs, deliberately separate. Refreshing a count is arithmetic and runs
+unattended on the 5th of each month (`.github/workflows/monthly-publications.yml`),
+opening a pull request only when a count actually moved. Discovery never adds
+anything: it appends refereed papers naming DKIST to `data/publications_pending.json`
+for review, because the screening pool contains a paper on *low-cost Keplerian
+telescopes* that happens to name DKIST, and no query can tell that apart from
+a coronal magnetometry result.
+
+For the workflow to do the citation half, set the token once:
+
+```bash
+gh secret set ADS_TOKEN --repo sr-dash/cryonirsp-viewer
+```
+
+Without it the run warns, changes nothing, and the page keeps the counts it has
+beside the date it took them.
+
 ## Data
 
 `data/cryonirsp_dataset_details.json` is generated, never hand-edited. Rebuild it from the upstream

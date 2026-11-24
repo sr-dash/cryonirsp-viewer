@@ -300,6 +300,12 @@ jobs:
             -o data/cryonirsp_dataset_details.json \
             --media-manifest media-manifest.txt
 
+      # The counts quoted in the page's description, link previews and
+      # structured data are what search results show. They were written by
+      # hand once and fell a month behind every month after that.
+      - name: Keep the page metadata equal to the inventory
+        run: python3 tools/sync_meta.py
+
       - name: Reject JSON the browser cannot parse
         run: node -e "JSON.parse(require('fs').readFileSync('data/cryonirsp_dataset_details.json','utf8'))"
 
@@ -403,7 +409,9 @@ jobs:
         if: steps.substance.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          add-paths: data/cryonirsp_dataset_details.json
+          add-paths: |
+            data/cryonirsp_dataset_details.json
+            index.html
           branch: inventory/monthly
           delete-branch: true
           commit-message: "Refresh the inventory from the Data Center"
