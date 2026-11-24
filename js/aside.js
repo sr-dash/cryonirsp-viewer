@@ -83,9 +83,9 @@ export function renderAside(el, records, q) {
                 ${q.pa ? `<path class="sel-arc" d="${selectionPath(q.pa)}" fill="var(--accent)" fill-opacity="0.13" stroke="var(--accent)" stroke-opacity="0.5"/>` : ''}
                 <circle cx="${CX}" cy="${CY}" r="${DISK}" fill="var(--sunk)" stroke="var(--edge)"/>
                 <circle cx="${CX}" cy="${CY}" r="${DISK}" fill="none" stroke="var(--accent)" stroke-opacity="0.45" stroke-width="1.2"/>
-                <text x="${CX}" y="${CY - DISK - 8}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="9" fill="var(--dim)">N</text>
-                <text x="${CX + DISK + 14}" y="${CY + 3}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="9" fill="var(--dim)">W</text>
-                <text x="${CX - DISK - 14}" y="${CY + 3}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="9" fill="var(--dim)">E</text>
+                <text x="${CX}" y="${CY - DISK - 8}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">N</text>
+                <text x="${CX + DISK + 14}" y="${CY + 3}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">W</text>
+                <text x="${CX - DISK - 14}" y="${CY + 3}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">E</text>
             </svg>
 
             <div class="readout">

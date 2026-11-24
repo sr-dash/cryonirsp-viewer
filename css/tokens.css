@@ -48,6 +48,27 @@
     --f-body:'Archivo', 'Helvetica Neue', Arial, sans-serif;
     --f-mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
+/* ---------------------------------------------------
+   TYPE SCALE
+
+   The page declared a 15px body and then overrode it almost everywhere
+   with sizes between 9.5 and 13.5, so the text people actually read was
+   two or three steps below the base. Twenty-five distinct sizes were in
+   use, five of them inside a two-pixel band — 11.5, 12, 12.5, 13, 13.5 —
+   which is not a scale, it is an accumulation.
+
+   Seven steps, each a readable distance from the next. Anything smaller
+   than --t-2xs is an uppercase key with letter-spacing doing the work,
+   and there is nothing below it.
+--------------------------------------------------- */
+    --t-2xs:11px;     /* uppercase keys, axis ticks */
+    --t-xs:12.5px;    /* mono labels, chips, captions */
+    --t-sm:14px;      /* secondary prose, controls */
+    --t-md:15px;      /* body */
+    --t-lg:16.5px;    /* emphasised body, list titles */
+    --t-xl:18px;      /* lede, small headings */
+    --t-2xl:22px;     /* figures */
+
     --rail:268px;
     --aside:332px;
 
@@ -67,7 +88,7 @@ body{
     background:var(--ground);
     color:var(--text);
     font-family:var(--f-body);
-    font-size:15px;
+    font-size:var(--t-xl);
     line-height:1.5;
     -webkit-font-smoothing:antialiased;
 }
@@ -103,7 +124,7 @@ a:hover{ text-decoration:underline; text-underline-offset:3px; }
 --------------------------------------------------- */
 
 .eyebrow{
-    font-size:10.5px;
+    font-size:var(--t-xs);
     font-weight:600;
     letter-spacing:0.14em;
     text-transform:uppercase;

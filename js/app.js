@@ -41,7 +41,7 @@ const $ = (s) => document.querySelector(s);
         console.error(err);
         $('#main').innerHTML =
             `<div class="empty">Could not load the inventory.<br>
-             <span style="font-size:12px;opacity:.7">${esc(err.message)}</span></div>`;
+             <span style="font-size:var(--t-sm);opacity:.7">${esc(err.message)}</span></div>`;
         return;
     }
 

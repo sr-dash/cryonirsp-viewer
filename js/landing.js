@@ -82,9 +82,9 @@ export function pointingRose(records) {
             <g>${wedges}</g>
             <circle cx="300" cy="300" r="132" fill="url(#disk)" stroke="var(--edge)"/>
             <circle cx="300" cy="300" r="132" fill="none" stroke="var(--accent)" stroke-opacity="0.5" stroke-width="1.4"/>
-            <text x="300" y="152" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">N</text>
-            <text x="448" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">W</text>
-            <text x="152" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="10" fill="var(--dim)">E</text>
+            <text x="300" y="152" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">N</text>
+            <text x="448" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">W</text>
+            <text x="152" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">E</text>
           </svg>`;
     return { svg, gapLabel, offLimb };
 }

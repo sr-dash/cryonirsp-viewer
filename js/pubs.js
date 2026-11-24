@@ -24,8 +24,29 @@ const state = {
     ins: null,        // instrument name, or null for all
     group: 'all',     // all | data | instrument
     year: null,       // number, or null
-    sort: 'year'      // year | cites | author
+    sort: 'year',     // year | cites | author
+    dir: null         // 'asc' | 'desc'; null means the field's natural order
 };
+
+// Which way round a field reads when you first pick it. Dates and citations
+// are interesting from the top; a list of names is only useful alphabetically.
+const NATURAL = { year: 'desc', cites: 'desc', author: 'asc' };
+
+const SORT_KEY = {
+    year:   (p) => p.year,
+    cites:  (p) => p.citations,
+    author: (p) => p.first_author
+};
+
+// The arrow says which way; these say what that means, for the tooltip and
+// for anyone on a screen reader, where a rotated glyph says nothing at all.
+const DIR_WORDS = {
+    year:   { desc: 'Newest first',      asc: 'Oldest first' },
+    cites:  { desc: 'Most cited first',  asc: 'Least cited first' },
+    author: { asc:  'A to Z',            desc: 'Z to A' }
+};
+
+const direction = () => state.dir || NATURAL[state.sort];
 
 const $ = (s) => document.querySelector(s);
 
@@ -41,6 +62,7 @@ function readURL() {
     const y = parseInt(p.get('year'), 10);
     state.year = Number.isFinite(y) ? y : null;
     state.sort = ['year', 'cites', 'author'].includes(p.get('sort')) ? p.get('sort') : 'year';
+    state.dir = ['asc', 'desc'].includes(p.get('dir')) ? p.get('dir') : null;
 }
 
 function writeURL() {
@@ -50,6 +72,9 @@ function writeURL() {
     if (state.group !== 'all') p.set('group', state.group);
     if (state.year) p.set('year', String(state.year));
     if (state.sort !== 'year') p.set('sort', state.sort);
+    // Only when it differs from the natural order, so the common case keeps
+    // a clean URL and a shared link does not pin something nobody chose.
+    if (state.dir && state.dir !== NATURAL[state.sort]) p.set('dir', state.dir);
     const url = p.toString() ? `?${p}` : location.pathname;
     history.replaceState({}, '', url);
 }
@@ -75,12 +100,18 @@ function matches(p) {
 
 function selected() {
     const rows = state.db.papers.filter(matches);
-    const by = {
-        year:   (a, b) => b.year - a.year || b.citations - a.citations,
-        cites:  (a, b) => b.citations - a.citations || b.year - a.year,
-        author: (a, b) => a.first_author.localeCompare(b.first_author)
-    };
-    return rows.sort(by[state.sort]);
+    const key = SORT_KEY[state.sort];
+    const sign = direction() === 'asc' ? 1 : -1;
+
+    return rows.sort((a, b) => {
+        const ka = key(a), kb = key(b);
+        const primary = typeof ka === 'string' ? ka.localeCompare(kb)
+                      : (ka < kb ? -1 : ka > kb ? 1 : 0);
+        if (primary) return primary * sign;
+        // Ties break the same way whichever direction is showing, so flipping
+        // the arrow reverses the list rather than reshuffling it.
+        return b.citations - a.citations || b.year - a.year;
+    });
 }
 
 // -----------------------------------------------------
@@ -340,11 +371,25 @@ function render() {
         </div>
         <div class="chips">${insChips}</div>
         <div class="pub-actions">
-          <select class="btn-sm" id="psort" aria-label="Sort publications">
-            <option value="year"${state.sort === 'year' ? ' selected' : ''}>Newest first</option>
-            <option value="cites"${state.sort === 'cites' ? ' selected' : ''}>Most cited</option>
-            <option value="author"${state.sort === 'author' ? ' selected' : ''}>First author</option>
-          </select>
+          <div class="sortbox">
+            <svg class="sort-ico" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M4 6h14M4 12h9M4 18h5"/>
+            </svg>
+            <select id="psort" aria-label="Sort publications by">
+              <option value="year"${state.sort === 'year' ? ' selected' : ''}>Date</option>
+              <option value="cites"${state.sort === 'cites' ? ' selected' : ''}>Citations</option>
+              <option value="author"${state.sort === 'author' ? ' selected' : ''}>First author</option>
+            </select>
+            <button class="dirbtn${direction() === 'asc' ? ' asc' : ''}" id="pdir"
+                    title="${esc(DIR_WORDS[state.sort][direction()])} — click to reverse"
+                    aria-label="${esc(DIR_WORDS[state.sort][direction()])}. Click to reverse the order.">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 5v14M6 13l6 6 6-6"/>
+              </svg>
+            </button>
+          </div>
           <button class="btn-sm primary" id="pdl">Download .bib</button>
         </div>
       </div>
@@ -416,7 +461,19 @@ function wire() {
     }
 
     const sort = $('#psort');
-    if (sort) sort.addEventListener('change', () => { state.sort = sort.value; update(); });
+    if (sort) sort.addEventListener('change', () => {
+        state.sort = sort.value;
+        // A new field starts in its own natural order rather than inheriting
+        // the last one's: "A to Z" carried over onto citations is nonsense.
+        state.dir = null;
+        update();
+    });
+
+    const dir = $('#pdir');
+    if (dir) dir.addEventListener('click', () => {
+        state.dir = direction() === 'asc' ? 'desc' : 'asc';
+        update();
+    });
 
     const dl = $('#pdl');
     if (dl) dl.addEventListener('click', () => {

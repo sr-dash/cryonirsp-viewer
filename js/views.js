@@ -180,7 +180,7 @@ export function renderRail(el, records, q) {
         </div>
         ${groups}
         <div style="border-top:1px solid var(--line); padding-top:14px;
-                    font-family:var(--f-mono); font-size:10px; color:var(--faint); line-height:1.7;">
+                    font-family:var(--f-mono); font-size:var(--t-2xs); color:var(--faint); line-height:1.7;">
             counts update against the rest<br>of the query
         </div>`;
 }
@@ -248,7 +248,7 @@ export function renderResults(el, rows, opts) {
     el.innerHTML = head + body +
         (rows.length > limit
             ? `<div class="more"><button class="linkish" id="showMore">show more — ${(rows.length - limit).toLocaleString()} remaining</button></div>`
-            : `<div class="more" style="color:var(--faint);font-family:var(--f-mono);font-size:10.5px;">end of results</div>`);
+            : `<div class="more" style="color:var(--faint);font-family:var(--f-mono);font-size:var(--t-xs);">end of results</div>`);
 }
 
 // -----------------------------------------------------
@@ -383,7 +383,7 @@ export function renderDetail(el, r) {
                     ${kv('Metadata file', r.metadataFile || '—')}
                     ${kv('Proposal', r.proposal || '—')}
                 </div>
-                <div style="margin-top:12px; display:flex; gap:16px; font-family:var(--f-mono); font-size:12px;">
+                <div style="margin-top:12px; display:flex; gap:16px; font-family:var(--f-mono); font-size:var(--t-sm);">
                     <a href="https://dkist.data.nso.edu/product/${encodeURIComponent(r.product)}" target="_blank" rel="noopener noreferrer">Data Center product →</a>
                     ${r.previewUrl ? `<a href="${esc(r.previewUrl)}" target="_blank" rel="noopener noreferrer">Preview movie →</a>` : ''}
                 </div>
@@ -430,7 +430,7 @@ function observingDayBlock(r) {
             ${issues}
             ${tags ? `<div class="tagset"${issues ? ' style="margin-top:10px"' : ''}>${tags}</div>` : ''}
             ${pubs ? `<div class="pubs" style="margin-top:10px">${pubs}</div>` : ''}
-            <div style="margin-top:10px; font-size:11.5px; color:var(--dim); line-height:1.5;">
+            <div style="margin-top:10px; font-size:var(--t-sm); color:var(--dim); line-height:1.5;">
                 These notes describe the whole observing day, so every product
                 taken on ${esc(r.observingDate || 'this date')} carries them.${r.summarySource
                     ? ` <a href="${escURL(r.summarySource)}" target="_blank" rel="noopener noreferrer">Daily summary</a>.` : ''}

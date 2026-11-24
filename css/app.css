@@ -12,13 +12,13 @@
 }
 .brand{ display:flex; align-items:baseline; gap:12px; cursor:pointer; min-width:0; }
 .brand .name{
-    font-family:var(--f-display); font-size:21px; letter-spacing:0.005em;
+    font-family:var(--f-display); font-size:var(--t-2xl); letter-spacing:0.005em;
     color:var(--text); white-space:nowrap;
 }
 .brand .eyebrow{ white-space:nowrap; }
 .masthead nav{
     display:flex; align-items:center; gap:22px;
-    font-size:13.5px; color:var(--muted); white-space:nowrap;
+    font-size:var(--t-lg); color:var(--muted); white-space:nowrap;
 }
 .masthead nav button{
     background:none; border:none; color:inherit; font:inherit; cursor:pointer; padding:4px 0;
@@ -65,7 +65,7 @@
     border:1px solid var(--edge);
     border-radius:2px;
     padding:4px 8px;
-    font-family:var(--f-mono); font-size:12px;
+    font-family:var(--f-mono); font-size:var(--t-sm);
     white-space:nowrap;
     cursor:pointer;
 }
@@ -76,7 +76,7 @@
     flex:1; min-width:180px;
     background:none; border:none; outline:none;
     color:var(--text);
-    font-family:var(--f-mono); font-size:12.5px;
+    font-family:var(--f-mono); font-size:var(--t-md);
 }
 #qinput::placeholder{ color:var(--faint); }
 
@@ -85,10 +85,10 @@
 .qhint{
     display:flex; justify-content:space-between; gap:16px;
     margin-top:8px;
-    font-size:11.5px; color:var(--dim);
+    font-size:var(--t-sm); color:var(--dim);
 }
 .qhint .keys{ display:flex; gap:6px; flex-wrap:wrap; }
-.qhint .keys span{ font-family:var(--f-mono); font-size:10.5px; border:1px solid var(--line); padding:2px 6px; cursor:pointer; }
+.qhint .keys span{ font-family:var(--f-mono); font-size:var(--t-xs); border:1px solid var(--line); padding:2px 6px; cursor:pointer; }
 .qhint .keys span:hover{ border-color:var(--edge); color:var(--muted); }
 
 /* =====================================================
@@ -114,17 +114,17 @@
 }
 .linkish{
     background:none; border:none; padding:0; cursor:pointer;
-    font-family:var(--f-body); font-size:11.5px; color:var(--accent-ink);
+    font-family:var(--f-body); font-size:var(--t-sm); color:var(--accent-ink);
 }
 .linkish:hover{ text-decoration:underline; text-underline-offset:3px; }
 .linkish[disabled]{ color:var(--faint); cursor:default; }
 
 .fgroup{ margin-bottom:20px; }
 .fgroup > h3{
-    font-size:12px; font-weight:600; margin-bottom:8px;
+    font-size:var(--t-sm); font-weight:600; margin-bottom:8px;
     display:flex; justify-content:space-between; align-items:baseline;
 }
-.fgroup > h3 span{ font-family:var(--f-mono); font-size:10px; color:var(--faint); font-weight:400; }
+.fgroup > h3 span{ font-family:var(--f-mono); font-size:var(--t-2xs); color:var(--faint); font-weight:400; }
 .fitems{ display:flex; flex-direction:column; gap:4px; }
 
 .facet{
@@ -141,8 +141,8 @@
 }
 .facet:hover{ border-color:var(--edge); color:var(--text); }
 .facet .dot{ width:8px; height:8px; flex:none; border-radius:1px; background:var(--faint); }
-.facet .lbl{ flex:1; font-size:12.5px; }
-.facet .n{ font-family:var(--f-mono); font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums; }
+.facet .lbl{ flex:1; font-size:var(--t-md); }
+.facet .n{ font-family:var(--f-mono); font-size:var(--t-xs); color:var(--faint); font-variant-numeric:tabular-nums; }
 .facet[aria-pressed="true"]{ background:var(--raised); color:var(--text); }
 .facet[aria-pressed="true"] .n{ color:var(--text); }
 .facet.zero{ opacity:0.38; }
@@ -158,10 +158,10 @@
 .count{ display:flex; align-items:baseline; gap:11px; }
 /* The result count changes on every keystroke and every drag: tabular mono
    keeps it from jittering, and it is a number like every other number here. */
-.count b{ font-family:var(--f-mono); font-size:25px; font-weight:500; font-variant-numeric:tabular-nums; }
-.count span{ font-size:13px; color:var(--muted); }
+.count b{ font-family:var(--f-mono); font-size:30px; font-weight:500; font-variant-numeric:tabular-nums; }
+.count span{ font-size:var(--t-md); color:var(--muted); }
 
-.viewsel{ display:flex; align-items:center; gap:12px; font-size:11.5px; color:var(--dim); }
+.viewsel{ display:flex; align-items:center; gap:12px; font-size:var(--t-sm); color:var(--dim); }
 .viewsel button{
     background:none; border:none; padding:2px 0; cursor:pointer;
     font:inherit; color:var(--dim); border-bottom:1px solid transparent;
@@ -174,7 +174,7 @@
     display:flex; align-items:center; gap:6px;
     background:var(--raised); border:1px solid var(--edge); border-radius:2px;
     padding:3px 8px; cursor:pointer;
-    font-size:11.5px;
+    font-size:var(--t-sm);
 }
 .chip .g{ color:var(--dim); }
 .chip:hover{ border-color:var(--accent); }
@@ -182,14 +182,17 @@
 /* table */
 .thead, .row{
     display:grid;
-    grid-template-columns:6px 76px minmax(0,1fr) 88px 106px 82px 62px 60px 34px;
+    grid-template-columns:6px 84px minmax(0,1fr) 86px 134px 94px 64px 70px 36px;
     gap:9px; align-items:center;
 }
 /* Column headers are labels, not data — body face like every other label. */
 .thead{
     padding:0 10px 8px;
+    /* Matches the row's selected-state border so both boxes are the same
+       width and the flexible column resolves identically in each. */
+    border-left:1px solid transparent;
     border-bottom:1px solid var(--line);
-    font-size:10px; font-weight:600; letter-spacing:0.09em;
+    font-size:var(--t-2xs); font-weight:600; letter-spacing:0.09em;
     text-transform:uppercase; color:var(--faint);
 }
 .thead button{
@@ -200,13 +203,17 @@
 
 .row{
     padding:10px; border-bottom:1px solid var(--line-soft);
-    cursor:pointer; border-left:1px solid transparent;
+    /* A <button> keeps the user agent's 2px border on any side the rule does
+       not name, so the right edge was quietly eating two pixels and the
+       flexible column resolved narrower here than in the header above it —
+       every column after it sat two pixels off its own heading. */
+    cursor:pointer; border-top:0; border-right:0; border-left:1px solid transparent;
     background:none; text-align:left; font:inherit; color:inherit; width:100%;
 }
 .row:hover{ background:var(--raised); }
 .row.on{ background:var(--raised); border-left-color:var(--accent); }
 .row .stripe{ width:6px; height:34px; border-radius:1px; align-self:center; }
-.row .id{ font-family:var(--f-mono); font-size:13px; letter-spacing:0.02em; }
+.row .id{ font-family:var(--f-mono); font-size:var(--t-md); letter-spacing:0.02em; }
 
 /* These were inline spans carrying block styling: product, target and mode
    ran together on one line and wrapped raggedly, so no two rows were the
@@ -217,19 +224,19 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     max-width:100%;
 }
-.row .prod{ font-family:var(--f-mono); font-size:11.5px; color:var(--muted); }
-.row .tgt{ font-size:12.5px; margin-top:3px; }
+.row .prod{ font-family:var(--f-mono); font-size:var(--t-sm); color:var(--muted); }
+.row .tgt{ font-size:var(--t-md); margin-top:3px; }
 .row .tgt em{ font-style:normal; color:var(--dim); }
 .row .m{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.row .m{ font-family:var(--f-mono); font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.row .m{ font-family:var(--f-mono); font-size:var(--t-xs); color:var(--muted); font-variant-numeric:tabular-nums; }
 .row .cal{
-    font-family:var(--f-mono); font-size:10px; text-align:center;
+    font-family:var(--f-mono); font-size:var(--t-2xs); text-align:center;
     border:1px solid var(--line); border-radius:2px; padding:2px 0; color:var(--faint);
 }
 .row .cal.has{ color:var(--muted); border-color:var(--edge); }
 
-.empty{ padding:60px 10px; color:var(--dim); font-size:14px; }
-.more{ padding:18px 10px; text-align:center; font-size:12px; color:var(--dim); }
+.empty{ padding:60px 10px; color:var(--dim); font-size:var(--t-lg); }
+.more{ padding:18px 10px; text-align:center; font-size:var(--t-sm); color:var(--dim); }
 
 /* grid view */
 .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(232px,1fr)); gap:14px; }
@@ -241,26 +248,26 @@
 .card .thumb{ aspect-ratio:16/9; background:var(--sunk); position:relative; overflow:hidden; }
 .card .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
 .card .meta{ padding:11px 12px; border-top:2px solid var(--edge); }
-.card .id{ font-family:var(--f-mono); font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.card .sub{ font-size:12px; color:var(--muted); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.card .id{ font-family:var(--f-mono); font-size:var(--t-md); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.card .sub{ font-size:var(--t-sm); color:var(--muted); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* =====================================================
    ASIDE — spatial + temporal pickers
 ===================================================== */
 
 .aside h3{
-    font-size:12px; font-weight:600; margin-bottom:9px;
+    font-size:var(--t-sm); font-weight:600; margin-bottom:9px;
     display:flex; justify-content:space-between; align-items:baseline;
 }
-.aside h3 span{ font-size:11px; color:var(--faint); font-weight:400; }
-.aside .note{ font-size:12.5px; color:var(--muted); line-height:1.45; margin-bottom:14px; }
+.aside h3 span{ font-size:var(--t-xs); color:var(--faint); font-weight:400; }
+.aside .note{ font-size:var(--t-md); color:var(--muted); line-height:1.45; margin-bottom:14px; }
 .aside section{ padding-bottom:18px; margin-bottom:18px; border-bottom:1px solid var(--line); }
 .aside section:last-child{ border-bottom:none; }
 
 #disk{ display:block; width:100%; height:auto; cursor:crosshair; user-select:none; }
 .readout{
     display:flex; justify-content:space-between; align-items:baseline;
-    font-size:11.5px; color:var(--dim);
+    font-size:var(--t-sm); color:var(--dim);
     margin-top:6px;
 }
 .readout b{ font-family:var(--f-mono); font-variant-numeric:tabular-nums; color:var(--accent-ink); font-weight:500; }
@@ -270,7 +277,7 @@
 .hist .bar.on{ background:var(--accent); }
 .hist .bar:hover{ background:var(--accent); filter:brightness(1.15); }
 /* Axis ends are dates and numbers — data, so mono. */
-.axis{ display:flex; justify-content:space-between; gap:8px; margin-top:7px; font-family:var(--f-mono); font-size:10px; color:var(--dim); }
+.axis{ display:flex; justify-content:space-between; gap:8px; margin-top:7px; font-family:var(--f-mono); font-size:var(--t-2xs); color:var(--dim); }
 .axis span:nth-child(2){ font-family:var(--f-body); }
 
 /* =====================================================
@@ -296,8 +303,8 @@
     padding:20px 26px 16px; border-bottom:1px solid var(--line);
     display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
 }
-.dhead .id{ font-family:var(--f-display); font-size:34px; line-height:1; }
-.dhead .sub{ font-family:var(--f-mono); font-size:11.5px; color:var(--muted); margin-top:7px; word-break:break-all; }
+.dhead .id{ font-family:var(--f-display); font-size:36px; line-height:1; }
+.dhead .sub{ font-family:var(--f-mono); font-size:var(--t-sm); color:var(--muted); margin-top:7px; word-break:break-all; }
 .xbtn{
     background:none; border:1px solid var(--edge); color:var(--muted);
     width:30px; height:30px; border-radius:2px; cursor:pointer; flex:none;
@@ -308,30 +315,30 @@
 .dbody{ padding:22px 26px 60px; }
 .dsec{ margin-bottom:26px; }
 .dsec > h4{
-    font-size:10.5px; font-weight:600; letter-spacing:0.13em;
+    font-size:var(--t-xs); font-weight:600; letter-spacing:0.13em;
     text-transform:uppercase; color:var(--dim); margin-bottom:11px;
 }
 .kv{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); }
 .kv > div{ background:var(--panel); padding:11px 13px; }
-.kv .k{ font-size:10px; font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--dim); }
-.kv .v{ font-family:var(--f-mono); font-size:13.5px; margin-top:4px; word-break:break-word; }
+.kv .k{ font-size:var(--t-2xs); font-weight:600; letter-spacing:0.09em; text-transform:uppercase; color:var(--dim); }
+.kv .v{ font-family:var(--f-mono); font-size:var(--t-lg); margin-top:4px; word-break:break-word; }
 
-.prose{ font-size:13.5px; line-height:1.65; color:var(--muted); max-height:180px; overflow-y:auto; }
+.prose{ font-size:var(--t-lg); line-height:1.65; color:var(--muted); max-height:180px; overflow-y:auto; }
 
 .lineage{ display:flex; flex-direction:column; gap:6px; }
 .lin{
     display:flex; justify-content:space-between; align-items:center;
     border:1px solid var(--line); border-radius:2px; padding:8px 11px;
-    font-family:var(--f-mono); font-size:12px;
+    font-family:var(--f-mono); font-size:var(--t-sm);
 }
-.lin .st{ font-family:var(--f-body); font-size:10.5px; font-weight:600; letter-spacing:0.07em; color:var(--dim); }
+.lin .st{ font-family:var(--f-body); font-size:var(--t-xs); font-weight:600; letter-spacing:0.07em; color:var(--dim); }
 .lin.active{ border-color:var(--accent); }
 .lin.active .st{ color:var(--accent-ink); }
 
 .media{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .media figure{ border:1px solid var(--line); background:var(--sunk); }
 .media img, .media video{ width:100%; display:block; }
-.media figcaption{ font-family:var(--f-mono); font-size:10.5px; color:var(--dim); padding:7px 9px; border-top:1px solid var(--line); }
+.media figcaption{ font-family:var(--f-mono); font-size:var(--t-xs); color:var(--dim); padding:7px 9px; border-top:1px solid var(--line); }
 
 /* =====================================================
    RESPONSIVE
@@ -347,6 +354,14 @@
     .brand .eyebrow{ display:none; }
 }
 
+/* Phones: the wordmark and the navigation stop competing for one line. */
+@media (max-width: 560px) {
+    .masthead{ padding:11px 16px; flex-wrap:wrap; gap:4px 14px; }
+    .brand .name{ font-size:var(--t-lg); }
+    .masthead nav{ gap:14px; font-size:var(--t-sm); }
+    .masthead nav .linkish{ display:none; }
+}
+
 /* Below this the name column starts eating its own text; the observing mode
    is the least load-bearing thing in the row, so it goes first. */
 @media (max-width:1520px){
@@ -360,7 +375,7 @@
 @media (max-width:860px){
     .body{ grid-template-columns:minmax(0,1fr); }
     .rail{ display:none; }
-    .thead, .row{ grid-template-columns:6px 76px minmax(0,1fr) 88px; }
+    .thead, .row{ grid-template-columns:6px 84px minmax(0,1fr) 86px; }
     .thead > :nth-child(n+5), .row > :nth-child(n+5){ display:none; }
 }
 
@@ -385,12 +400,12 @@
 .avail.lapsed{ border-left-color:var(--accent); }
 .avail-head{
     display:flex; align-items:center; gap:8px;
-    font-size:13px; font-weight:600; margin-bottom:5px;
+    font-size:var(--t-md); font-weight:600; margin-bottom:5px;
 }
 .avail.embargoed .avail-head{ color:var(--warn); }
 .avail.open .avail-head{ color:var(--ok); }
 .avail.lapsed .avail-head{ color:var(--accent-ink); }
-.avail-body{ font-size:12.5px; line-height:1.55; color:var(--muted); }
+.avail-body{ font-size:var(--t-md); line-height:1.55; color:var(--muted); }
 .avail-body b{ font-family:var(--f-mono); font-weight:500; color:var(--text); }
 
 /* =====================================================
@@ -459,7 +474,7 @@
 .facet.cat{
     margin-top:8px; border:none; border-bottom:1px solid var(--line);
     border-radius:0; padding:5px 2px 5px 0;
-    font-size:10.5px; font-weight:600; letter-spacing:0.09em; text-transform:uppercase;
+    font-size:var(--t-xs); font-weight:600; letter-spacing:0.09em; text-transform:uppercase;
     color:var(--dim);
 }
 .facet.cat:first-child{ margin-top:0; }
@@ -471,12 +486,12 @@
 .tag{
     display:inline-flex; align-items:center; gap:7px;
     border:1px solid var(--line); border-radius:2px;
-    padding:5px 9px; font-size:12.5px; color:var(--text);
+    padding:5px 9px; font-size:var(--t-md); color:var(--text);
     background:var(--panel);
 }
 a.tag:hover{ border-color:var(--accent); text-decoration:none; }
 .tag .cat{
-    font-size:9.5px; font-weight:600; letter-spacing:0.09em; text-transform:uppercase;
+    font-size:var(--t-2xs); font-weight:600; letter-spacing:0.09em; text-transform:uppercase;
     color:var(--dim);
 }
 .tag svg{ color:var(--dim); flex:none; }
@@ -489,16 +504,16 @@ a.tag:hover{ border-color:var(--accent); text-decoration:none; }
 }
 .issue.data{ border-left-color:var(--fexiii_1074); }
 .issue .k{
-    font-size:9.5px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase;
+    font-size:var(--t-2xs); font-weight:600; letter-spacing:0.1em; text-transform:uppercase;
     color:var(--warn); margin-bottom:3px;
 }
 .issue.data .k{ color:var(--fexiii_1074); }
-.issue .v{ font-size:12.5px; color:var(--text); line-height:1.5; }
+.issue .v{ font-size:var(--t-md); color:var(--text); line-height:1.5; }
 
 .pubs{ display:flex; flex-direction:column; gap:5px; }
 .pub{
     display:flex; align-items:center; gap:8px;
-    font-size:13px; padding:7px 11px;
+    font-size:var(--t-md); padding:7px 11px;
     border:1px solid var(--line); border-radius:2px;
 }
 .pub:hover{ border-color:var(--accent); }
@@ -509,7 +524,7 @@ a.tag:hover{ border-color:var(--accent); text-decoration:none; }
 /* A context-imager row shows its passband, marked so it never reads as a
    spectrograph observation of the same line. */
 .row .viaFilter{
-    margin-left:5px; font-size:9.5px; letter-spacing:0.06em;
+    margin-left:5px; font-size:var(--t-2xs); letter-spacing:0.06em;
     text-transform:uppercase; color:var(--dim);
 }
 
@@ -584,10 +599,10 @@ figure:hover .media-open.corner,
     width:min(1500px, 94vw);
     animation:fadeIn var(--dur-slow) var(--ease) backwards; animation-delay:60ms;
 }
-.lb-caption{ font-family:var(--f-mono); font-size:11.5px; color:#C7D2DA; }
+.lb-caption{ font-family:var(--f-mono); font-size:var(--t-sm); color:#C7D2DA; }
 .lb-actions{ display:flex; gap:8px; }
 .lb-btn{
-    font:inherit; font-size:12px; cursor:pointer;
+    font:inherit; font-size:var(--t-sm); cursor:pointer;
     background:rgba(255,255,255,.07); color:#EAF1F5;
     border:1px solid rgba(255,255,255,.22); border-radius:2px;
     padding:6px 12px; text-decoration:none;
@@ -608,7 +623,7 @@ body.lb-locked{ overflow:hidden; }
     display:flex; gap:11px; align-items:flex-start;
     border:1px solid var(--line); border-left:3px solid var(--dim);
     border-radius:2px; padding:12px 14px;
-    font-size:12.5px; line-height:1.55; color:var(--muted);
+    font-size:var(--t-md); line-height:1.55; color:var(--muted);
 }
 .pending-media svg{ color:var(--dim); flex:none; margin-top:1px; }
 .pending-media b{ color:var(--text); font-weight:600; }
