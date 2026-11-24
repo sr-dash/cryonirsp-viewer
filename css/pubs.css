@@ -24,16 +24,19 @@
     padding:40px 0 26px;
     border-bottom:1px solid var(--line);
 }
+/* Weight, tracking and the italic all follow .hero h1 in landing.css. The
+   em deliberately does NOT set a family: it inherits Newsreader, which is
+   loaded with a real italic (ital,wght@...1,400). Asking Archivo for italic
+   instead — as this first did — gets a synthesised one, because Archivo is
+   fetched with no italic axis, and the browser shears the upright glyphs to
+   fake it. That shear is what makes the heading look subtly stretched. */
 .pub-head h1{
-    font-family:var(--f-display); font-weight:600;
-    font-size:clamp(30px, 4.2vw, 46px); line-height:1.04;
-    letter-spacing:-0.012em; margin:10px 0 14px; color:var(--text);
+    font-family:var(--f-display); font-weight:400;
+    font-size:clamp(32px, 4.6vw, 52px); line-height:1.04;
+    letter-spacing:-0.015em; margin:10px 0 14px; color:var(--text);
     text-wrap:balance;
 }
-.pub-head h1 em{
-    font-family:var(--f-body); font-style:italic; font-weight:400;
-    color:var(--accent-ink);
-}
+.pub-head h1 em{ font-style:italic; color:var(--accent-ink); }
 .pub-lede{
     color:var(--muted); font-size:14.5px; line-height:1.62;
     max-width:62ch; margin:0;
@@ -45,14 +48,15 @@
     font-variant-numeric:tabular-nums;
 }
 .pub-figures div{ min-width:0; }
+/* Numerals are mono everywhere on this site — see .figures in landing.css. */
 .pub-figures .n{
-    font-family:var(--f-display); font-size:30px; line-height:1;
-    color:var(--text);
+    font-family:var(--f-mono); font-size:23px; line-height:1;
+    font-variant-numeric:tabular-nums; color:var(--text);
 }
-.pub-figures .n small{ font-size:14px; color:var(--dim); }
+.pub-figures .n small{ font-size:14px; color:var(--muted); }
 .pub-figures .k{
-    font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--dim); margin-top:7px;
+    font-size:10px; font-weight:600; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--dim); margin-top:5px;
 }
 
 /* ---------- chart ---------- */
@@ -66,7 +70,7 @@
     gap:20px; flex-wrap:wrap; margin-bottom:4px;
 }
 .pub-sechead h2{
-    font-family:var(--f-display); font-weight:500; font-size:17px;
+    font-family:var(--f-display); font-weight:400; font-size:28px;
     color:var(--text); margin:0;
 }
 .pub-aside{ font-size:11.5px; color:var(--dim); }
@@ -175,7 +179,7 @@ select.btn-sm{ appearance:none; padding-right:26px; }
 
 .cites{ text-align:right; padding-top:2px; }
 .cites .n{
-    font-family:var(--f-display); font-size:22px; line-height:1;
+    font-family:var(--f-mono); font-size:20px; line-height:1;
     color:var(--text); font-variant-numeric:tabular-nums;
 }
 .cites .n.zero{ color:var(--faint); }
@@ -268,7 +272,7 @@ select.btn-sm{ appearance:none; padding-right:26px; }
         padding:28px 0 22px;
     }
     .pub-figures{ gap:22px; }
-    .pub-figures .n{ font-size:24px; }
+    .pub-figures .n{ font-size:20px; }
     .paper{ grid-template-columns:1fr; gap:10px; }
     .cites{
         text-align:left; display:flex; align-items:baseline; gap:8px;
