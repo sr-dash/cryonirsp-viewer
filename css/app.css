@@ -375,8 +375,61 @@
 @media (max-width:860px){
     .body{ grid-template-columns:minmax(0,1fr); }
     .rail{ display:none; }
-    .thead, .row{ grid-template-columns:6px 84px minmax(0,1fr) 86px; }
-    .thead > :nth-child(n+5), .row > :nth-child(n+5){ display:none; }
+}
+
+/* Below the width where the facet rail folds away, a row stops being a table
+   row. It used to become four columns with the other five set to display:none
+   — the spectral line among them, which is the thing most people came here to
+   look at — and the product name squeezed under a hundred pixels. There is no
+   width at which that is better than stacking, so there is no middle state:
+   identifier and date on the first line, product and target on the second,
+   the measurements wrapped underneath. Nothing is hidden at any size. */
+@media (max-width:860px){
+    .thead{ display:none; }
+
+    .row{
+        display:flex; flex-wrap:wrap; align-items:baseline;
+        gap:5px 11px; padding:13px 12px 14px;
+    }
+    .row .stripe{ order:0; height:15px; align-self:center; }
+    .row .id{ order:1; }
+    .row > :nth-child(4){ order:2; margin-left:auto; }   /* observed date */
+    .row > :nth-child(3){ order:3; flex:1 0 100%; }      /* product + target */
+    .row > :nth-child(n+5){ display:block; order:4; }    /* the measurements */
+    .row .cal{ order:5; padding:1px 7px; }
+
+    /* They were columns truncating at a fixed width; now they are a line of
+       facts and each should be as long as it needs to be. */
+    .row .m{ overflow:visible; }
+
+    /* A faint separator so four grey mono values do not read as one string.
+       It trails its own value rather than leading the next one, because a
+       wrapped line must not begin with a dangling middot. */
+    .row > :nth-child(5)::after,
+    .row > :nth-child(6)::after,
+    .row > :nth-child(7)::after{
+        content:'\00b7'; margin-left:11px; color:var(--faint);
+    }
+
+    /* The count and the view switch stop sharing a line: "1,021 products —
+       the whole archive" was wrapping into three narrow lines beside them. */
+    .results-head{ flex-wrap:wrap; gap:6px 16px; }
+    .count{ flex:1 0 100%; }
+
+    /* The field prefixes are a power-user affordance and were taking four
+       rows above the first result. The placeholder still names them. */
+    .qhint .keys{ display:none; }
+    .qhint{ justify-content:flex-start; }
+
+    /* 80vw leaves a 75px strip of unreachable list behind the drawer and
+       squeezes the detail into a column narrow enough to break the product
+       identifier across three lines. On a phone the detail is the view. */
+    .drawer{ width:100%; border-left:none; }
+
+    /* Two 150px columns on a 375px screen leave each value too narrow for
+       the words that go in them: "Spectropolarimetry" was breaking across
+       a line mid-word. One column per fact, full width. */
+    .kv{ grid-template-columns:1fr; }
 }
 
 /* `hidden` must beat the inline display:contents on the search shell */
