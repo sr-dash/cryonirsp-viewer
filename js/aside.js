@@ -83,9 +83,9 @@ export function renderAside(el, records, q) {
                 ${q.pa ? `<path class="sel-arc" d="${selectionPath(q.pa)}" fill="var(--accent)" fill-opacity="0.13" stroke="var(--accent)" stroke-opacity="0.5"/>` : ''}
                 <circle cx="${CX}" cy="${CY}" r="${DISK}" fill="var(--sunk)" stroke="var(--edge)"/>
                 <circle cx="${CX}" cy="${CY}" r="${DISK}" fill="none" stroke="var(--accent)" stroke-opacity="0.45" stroke-width="1.2"/>
-                <text x="${CX}" y="${CY - DISK - 8}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">N</text>
-                <text x="${CX + DISK + 14}" y="${CY + 3}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">W</text>
-                <text x="${CX - DISK - 14}" y="${CY + 3}" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">E</text>
+                <text x="${CX}" y="${CY - DISK + 17}" text-anchor="middle" pointer-events="none" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">N</text>
+                <text x="${CX + DISK - 15}" y="${CY + 4}" text-anchor="middle" pointer-events="none" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">W</text>
+                <text x="${CX - DISK + 15}" y="${CY + 4}" text-anchor="middle" pointer-events="none" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13" fill="var(--dim)">E</text>
             </svg>
 
             <div class="readout">
@@ -141,43 +141,63 @@ function inRange(pa, [a, b]) {
 // drag interaction on the disk
 // -----------------------------------------------------
 
+// The gesture has to outlive the element it began on. Every pointermove
+// repaints the aside to show the arc growing, and that repaint replaces this
+// very <svg> — so a drag whose state lives in a closure over the old element,
+// listening on the old element, dies on its first move: the arc froze at
+// wherever the pointer happened to be one frame in, and dragging across the
+// disk did nothing. The state sits out here and the listeners are on the
+// window, so neither is lost when the element underneath is rebuilt.
+let drag = null;
+let listening = false;
+
+function angleAt(evt) {
+    const svg = document.getElementById('disk');   // looked up fresh: see above
+    if (!svg) return null;
+    const box = svg.getBoundingClientRect();
+    if (!box.width) return null;
+    const x = (evt.clientX - box.left) / box.width * 300 - CX;
+    const y = (evt.clientY - box.top) / box.height * 300 - CY;
+    return { deg: (Math.atan2(-y, x) * 180 / Math.PI + 360) % 360, rad: Math.hypot(x, y) };
+}
+
 export function wireDisk(svg, onChange) {
     if (!svg) return;
 
-    const angleAt = (evt) => {
-        const box = svg.getBoundingClientRect();
-        const x = (evt.clientX - box.left) / box.width * 300 - CX;
-        const y = (evt.clientY - box.top) / box.height * 300 - CY;
-        const rad = Math.hypot(x, y);
-        return { deg: (Math.atan2(-y, x) * 180 / Math.PI + 360) % 360, rad };
+    // Assigned rather than added: this runs again on every repaint, and a new
+    // element each time would otherwise be fine but the old ones leak handlers.
+    svg.onpointerdown = (e) => {
+        const a = angleAt(e);
+        if (!a) return;
+        if (a.rad < DISK * 0.55) { onChange(null); return; }   // centre clears
+        drag = { from: a.deg, onChange };
+        e.preventDefault();   // the SVG would otherwise start a native drag
     };
 
-    let from = null;
+    if (listening) return;
+    listening = true;
 
-    svg.addEventListener('pointerdown', (e) => {
-        const { deg, rad } = angleAt(e);
-        if (rad < DISK * 0.55) { onChange(null); return; }   // centre clears
-        from = deg;
-        svg.setPointerCapture(e.pointerId);
-    });
-
-    svg.addEventListener('pointermove', (e) => {
-        if (from === null) return;
-        const { deg } = angleAt(e);
-        onChange(normalise(from, deg), true);
+    window.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        const a = angleAt(e);
+        if (a) drag.onChange(normalise(drag.from, a.deg), true);
     });
 
     const finish = (e) => {
-        if (from === null) return;
-        const { deg } = angleAt(e);
-        const span = Math.abs(deg - from);
+        if (!drag) return;
+        const { from, onChange: fire } = drag;
+        drag = null;
+        const a = angleAt(e);
+        if (!a) return;
+        const span = Math.abs(a.deg - from);
         // A click, not a drag: select the single 15° sector under the cursor.
-        onChange(span < 3 ? [Math.floor(from / 15) * 15, Math.floor(from / 15) * 15 + 15] : normalise(from, deg));
-        from = null;
+        fire(span < 3
+            ? [Math.floor(from / 15) * 15, Math.floor(from / 15) * 15 + 15]
+            : normalise(from, a.deg));
     };
 
-    svg.addEventListener('pointerup', finish);
-    svg.addEventListener('pointercancel', () => { from = null; });
+    window.addEventListener('pointerup', finish);
+    window.addEventListener('pointercancel', () => { drag = null; });
 }
 
 function normalise(a, b) {

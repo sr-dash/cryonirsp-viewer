@@ -82,9 +82,15 @@ export function pointingRose(records) {
             <g>${wedges}</g>
             <circle cx="300" cy="300" r="132" fill="url(#disk)" stroke="var(--edge)"/>
             <circle cx="300" cy="300" r="132" fill="none" stroke="var(--accent)" stroke-opacity="0.5" stroke-width="1.4"/>
-            <text x="300" y="152" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">N</text>
-            <text x="448" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">W</text>
-            <text x="152" y="304" text-anchor="middle" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">E</text>
+            <!-- Outside the spokes, not among them. These were at r=148, which
+                 is inside the wedge band (135 to 251), so a letter sat on the
+                 disk rim with bars running through it. This rose does not fill
+                 its 600-unit box, so there is room at r=270 to put them where a
+                 compass label belongs. The rail's rose has no such room and
+                 solves it the other way, inside the disk. -->
+            <text x="300" y="36" text-anchor="middle" pointer-events="none" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">N</text>
+            <text x="570" y="305" text-anchor="middle" pointer-events="none" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">W</text>
+            <text x="30" y="305" text-anchor="middle" pointer-events="none" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="15" fill="var(--dim)">E</text>
           </svg>`;
     return { svg, gapLabel, offLimb };
 }
