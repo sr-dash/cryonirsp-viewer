@@ -273,6 +273,14 @@
     font-size:var(--t-2xs); letter-spacing:0.08em; text-transform:uppercase;
     color:var(--dim); display:block; margin-bottom:6px;
 }
+/* Saying nothing is here is not a heading. Sentence case, quieter, and no
+   accent rule down the side — the bordered callout is for the ones that
+   actually link somewhere. */
+.cited-ids.none{
+    background:none; border-left-color:var(--line);
+    color:var(--dim); font-size:var(--t-xs); padding:7px 12px;
+}
+
 .cited-ids a{
     font-family:var(--f-mono); font-size:var(--t-sm);
     color:var(--accent-ink); text-decoration:none;
@@ -312,6 +320,12 @@
     .cites .k{ margin-top:0; }
     .paper-tools{ margin-left:0; }
     .pub-controls{ position:static; }
+
+    /* margin-left:auto is right when these sit at the end of a wide toolbar
+       and wrong once the toolbar has wrapped: it left a 35px gap and pushed
+       both controls off the left margin everything else lines up on. */
+    .pub-actions{ margin-left:0; width:100%; }
+    .pub-actions .sortbox{ flex:1 1 auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

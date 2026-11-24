@@ -282,9 +282,9 @@ function paperHTML(p) {
                 title="Open ${esc(id)} in the archive">${esc(id)}</a>`).join('')}
         </div>`
       : p.ids_cited.length ? `
-        <div class="cited-ids">
-          <span class="lbl">Cites ${p.ids_cited.length} DKIST dataset
-            ${p.ids_cited.length === 1 ? 'ID' : 'IDs'}, none held in this archive</span>
+        <div class="cited-ids none">
+          <span>Cites ${p.ids_cited.length} DKIST dataset
+            ${p.ids_cited.length === 1 ? 'ID' : 'IDs'} — none of them held in this archive.</span>
         </div>` : '';
 
     return `
